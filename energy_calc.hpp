@@ -10,8 +10,6 @@ Reu1: Nov 2017
 using namespace std;
 using namespace arma;
 
-//compile with: g++ <funtion>.cpp -o test -O2 -larmadillo; ./test
-
 template <class T> //probably don't need template
 T psi_function (T x){
 
@@ -65,8 +63,10 @@ mat generate_esmooth (T u, T v){
 	//fill odd rows / even columns ( uypd + vypd )
 	//fill even rows / odd columns ( uxpd + vxpd )
 
-
-	//fill in here (everything but w and h are 35x51 matrices)
+  //FROM MATLAB:
+  //psidashFS( 1:2:end, 2:2:end ) = psiDerivative( uypd + vypd ) ;
+  //psidashFS( 2:2:end, 1:2:end ) = psiDerivative( uxpd + vxpd ) ;
+  //where psidashFS is e_smooth
 	//also e_smooth is huge
 
 	return e_smooth;

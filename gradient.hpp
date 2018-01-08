@@ -3,6 +3,7 @@ gradient.hpp
 Jacob Wiebe & James Dolman
 Rev1: Nov 2017
 */
+
 #include <iostream>
 #include <armadillo>
 
@@ -25,7 +26,7 @@ void gradient (T &x_deriv, T &y_deriv, T &I){
     //denominator = 2 * variance;
     //derivative = derivative % (temp / variance);
 
-  //gaussDeriv
+  //M: gaussDeriv
   //http://arma.sourceforge.net/docs.html#linspace
   temp = linspace(-limit, limit, (2 * limit + 1));
   numerator = temp % temp; //returns element-wise product

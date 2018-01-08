@@ -6,8 +6,6 @@ Rev1: Nov 2017
 
 #include <iostream>
 //#include <armadillo>
-//#include "conversion.hpp"
-#include "gradient.hpp"
 
 //using namespace std;
 //using namespace arma;
