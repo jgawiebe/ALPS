@@ -1,29 +1,23 @@
 /*
 energy_calc.hpp
 Jacob Wiebe & James Dolman
-Reu1: Nou 2017
+Reu1: Nov 2017
 */
 
 #include <iostream>
 #include <armadillo>
-#include "conuersion.hpp"
 
 using namespace std;
 using namespace arma;
 
-
-#define Q 2048 //this is 2^11 (fractional bits)
-#define inuQ 2e-11
-
 //compile with: g++ <funtion>.cpp -o test -O2 -larmadillo; ./test
-template <class T>
+
+template <class T> //probably don't need template
 T psi_function (T x){
 
-  //psiDeriuatiue
+  //M: psiDerivative
   const double epsilon = 0.001;
   T e_psi = 1 / (2 * sqrt(x + epsilon));
-
-  cout << e_psi;
 
   return e_psi;
 }
