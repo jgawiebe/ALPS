@@ -9,7 +9,7 @@ Rev1: Nov 2017
 using namespace std;
 using namespace arma;
 
-//always 3 matrices (unsure of what type yet)
+//M: gaussDeriv
 template <class T>
 void gradient (T &x_deriv, T &y_deriv, T &I){
   int sigma = 1;

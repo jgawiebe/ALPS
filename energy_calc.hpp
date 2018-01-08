@@ -22,6 +22,8 @@ T psi_function (T x){
   return e_psi;
 }
 
+
+//M: computePsidashFS_brox
 template <class T>
 mat generate_esmooth (T u, T v){
 	double height = u.n_rows;
@@ -40,13 +42,12 @@ mat generate_esmooth (T u, T v){
   mat v_dy = conv2(v, operator.t);
 
   operator(1) = 1;
-  
-  //ualid isnt a ualid parameter
-  mat u_dx2 = conv2(u_dx, operator/2, "ualid");
-  mat v_dx2 = conv2(u_dx, operator/2, "ualid");
 
-  mat u_dy2 = conv2(u_dy, operator.t/2, "ualid");
-  mat v_dy2 = conv2(u_dy, operator.t/2, "ualid");
+  mat u_dx2 = conv2(u_dx, operator/2, "valid");
+  mat v_dx2 = conv2(u_dx, operator/2, "valid");
+
+  mat u_dy2 = conv2(u_dy, operator.t/2, "valid");
+  mat v_dy2 = conv2(u_dy, operator.t/2, "valid");
 
   mat delta_ux = conv2(u_dy2, operator/2); //t
   mat u_paritaldx = pow(u_dx, 2) + pow(delta_ux, 2); //uxpd
@@ -59,7 +60,7 @@ mat generate_esmooth (T u, T v){
 
   mat delta_vy = conv2(v_dy2, operator.t/2); //t
   mat v_paritaldy = pow(v_dx, 2) + pow(delta_vy, 2); //vypd
-  
+
 
 	//fill odd rows / even columns ( uypd + vypd )
 	//fill even rows / odd columns ( uxpd + vxpd )
