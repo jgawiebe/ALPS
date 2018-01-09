@@ -33,10 +33,14 @@ vec successive_overrelaxation (int& failure, mat A, vec x, vec duv, vec b, doubl
   return duv;
 }
 
-
-void split (mat& M, mat& N, vec&b, mat A, double b, double w) {
+//complete
+void split (mat& M, mat& N, vec& b, mat A, double b, double omega) {
+	//omega is the relaxation scalar
 	double height = A.n_rows;
 	double width = A.n_cols;
-
-
+	mat diagA = diag(diag( A ));
+	
+	b = omega * b;
+	M =  omega * (trimatl( A, -1) + diagA);
+	N = -omega * (trimatu(A, 1) + ((1-omega) * diagA));
 }
