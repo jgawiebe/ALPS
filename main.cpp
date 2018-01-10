@@ -17,7 +17,7 @@ int main (){
 
 	//non-matrices: alpha, dt, gamma, ht, i, num_levels, wt
   double alpha = 30.0, gamma = 80.0;
-  int num_levels = 40;
+  int num_levels = 40, outer_iter = 3, inner_iter = 500;
 
 	//M: optic_flow_brox
 	//define u and v
@@ -25,6 +25,8 @@ int main (){
 	
 	//check this loop
 	for(int i = 0; i < num_levels; i++) {
+
+
 		//perform calc derivatives from optic_flow.hpp
 		//perform optic flow to get du and dv
 		

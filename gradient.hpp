@@ -36,8 +36,6 @@ void gradient (T &x_deriv, T &y_deriv, T &I){
 
   derivative = derivative % temp; //can't perform % with std vectors
 
-  x_deriv = conv2( I, derivative, "same" ) ;
-  y_deriv = conv2( I, derivative.t(), "same" ) ;
-
-  return;
+  x_deriv = conv2(I, derivative, "same");
+  y_deriv = conv2(I, derivative.t(), "same");
 }
