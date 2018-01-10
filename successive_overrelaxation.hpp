@@ -14,7 +14,7 @@ using namespace arma;
 //M: sor
 //the solution 'x' is the vector 'duv'
 //failure flag can also be used outside this function
-vec successive_overrelaxation (int& failure, mat A, vec x, vec duv, vec b, double omega, int inner_iter, double tolerance){
+vec successive_overrelaxation (int& failure, mat A, vec x, vec b, double omega, int inner_iter, double tolerance){
 	//temp variables for matrix splitting
 	mat M, N;
 	
