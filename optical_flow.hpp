@@ -82,6 +82,5 @@ void optical_flow (double alpha, double gamma, double omega, mat u, mat v, int o
 		//seperate duv into du and dv
 
 		//deal with fail_flag
-
 	}
 }
