@@ -19,6 +19,19 @@ int main (){
   double alpha = 30.0, gamma = 80.0;
   int num_levels = 40;
 
+	//M: optic_flow_brox
+	//define u and v
+	
+	
+	//check this loop
+	for(int i = 0; i < num_levels; i++) {
+		//perform calc derivatives from optic_flow.hpp
+		//perform optic flow to get du and dv
+		
+		u = u + du;
+		v = v + dv;
+	}
+
 
   return 1;
 }
