@@ -32,11 +32,15 @@ mat g_smooth (mat img, double scale){
 	grid /= sum(grid);
 
 	//ISSUE HERE
-	g_smooth = conv2(grid,grid, img, "same"); //cannot perform this with armadillo
+	smooth_img = conv2(grid,grid, img, "same"); //cannot perform this with armadillo
 
 	//non-matrices: endthresh, maxMaskSize, sigma, scale factor
 	//vectors: lim, grid
 	//img is in 3d in matlab rgb
+
+
+	//how do I make this bilinear??
+	smooth_img.resize()
 
 return smooth_img;
 }
