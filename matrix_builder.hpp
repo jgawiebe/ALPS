@@ -15,7 +15,7 @@ void build_matrix (){
 
 	//non-matrices: gamma, ht, wt
 	//vectors: vals, b, cols, ind, pdfaltsumu/v
-	//sparse: A
+	//sparse: Aa
 
   return;
 }
