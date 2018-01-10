@@ -10,6 +10,11 @@ Rev1: Nov 2017
 using namespace std;
 using namespace arma;
 
+//M: optic_flow
+void compute_derivatives(){
+	
+}
+
 //M: resolutionProcess
 void optical_flow (mat& ){
 
