@@ -1,3 +1,16 @@
+#eclipse
 /.project
 /.autotools
 /.cproject
+
+#pictures
+Car.bmp
+Car_0.bmp
+
+#visual studio
+.vscode/launch.json
+.vscode/tasks.json
+
+#bash
+test
+
