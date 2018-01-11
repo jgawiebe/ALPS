@@ -6,11 +6,11 @@ Rev1: Nov 2017
 
 #include <iostream>
 #include <armadillo>
-// #include <cv.hpp>
+#include <cv.hpp>
 
 using namespace std;
-using namespace arma;
-//using namespace cv;
+//using namespace arma;
+using namespace cv;
 //g++ test.cpp -o test -O2 -larmadillo `pkg-config --cflags --libs opencv`; ./test
 
 //compile with: g++ test.cpp -o test -O2 -larmadillo; ./test
@@ -29,8 +29,8 @@ int main(){
 
 
 //TESTING MATRIX_BUILDER
-  mat u(50, 50, fill::randu);
-  mat e_smooth(8, 16, fill::randu);
+  // mat u(50, 50, fill::randu);
+  // mat e_smooth(8, 16, fill::randu);
 
 
 
