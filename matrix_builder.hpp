@@ -39,7 +39,11 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	// M: ros = tmp(:);
 	int temp4repmat = 2*height*width*6;
 	int tempPop = 1;
-	vec rows = (temp4repmat); //column vector of size temp4repmat
+	//this syntax does not work
+	//vec rows = (temp4repmat); 
+
+	vec rows(temp4repmat); //column vector of size temp4repmat
+
 	for (int i = 0; i<temp4repmat ; i++){
 		rows(i) = tempPop;
 		if(i%6 == 0){
