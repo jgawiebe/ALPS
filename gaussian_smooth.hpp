@@ -32,7 +32,7 @@ mat g_smooth (mat img, double scale){
 	grid /= sum(grid);
 
 	//ISSUE HERE
-	smooth_img = conv2(grid,grid, img, "same"); //cannot perform this with armadillo
+	smooth_img = conv2(grid, grid, img, "same"); //cannot perform this with armadillo
 
 	//non-matrices: endthresh, maxMaskSize, sigma, scale factor
 	//vectors: lim, grid

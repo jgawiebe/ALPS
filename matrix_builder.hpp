@@ -10,44 +10,30 @@ Rev1: Nov 2017
 using namespace std;
 using namespace arma;
 
-mat u ;
-mat E_smooth;
-int height = 0;
-int width = 0;
+// mat u ;
+// mat e_smooth;
+// int height = 0, width = 0;
 
 //M: constructMatrix
-void build_matrix (mat& A, vec& b, img2_dx,mat img2_dy,mat img_z,
-		mat dxx,mat dxy,mat dyy,mat img_dxz,mat e_data,
-		mat E_smooth,mat u,mat v,double gamma){
-	//Question here, what if matrix u is not a square?
-	//how do we use size() to get height and width then.
+void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
+		mat dxx, mat dxy, mat dyy, mat img_dxz, mat e_data,
+		mat e_smooth, mat u, mat v, double gamma){
 
-	height = size(u);
-	width = size(u);
-	//or do height = u.n_rows; //Question: does that work?
+	int height = u.n_rows;
+	int width = u.n_cols;
 
-	//way to test what size u produces
-	//mat u (5,9);
-	//cout << "size of u: " << size(u) << endl;
-	//if this size doesn't work, try doing this and test again
-	//height = u.n_rows;
-	//width = u.n_cols;
+	int e_height = e_smooth.n_rows;
+	int e_width = e_smooth.n_cols;
 
-	//next frame off the matrix E_smooth with zeroes (not sure if correct)
-	//please test
-	int E_smoothheight = E_smooth.n_rows;
-	int E_smoothwidth = E_smooth.n_cols;
-	//top and bottom row to zero
-	E_smooth.row(0).zeros;
-	E_smooth.row(E_smoothheight-1).zeros;
-	//left and right cols to zero
-	E_smooth.col(0).zeros;
-	E_smooth.col(E_smoothwidth-1).zeros;
-	//see if this frames it off with zeros
-	//main concern is if the .zeros() function can be used this way.
-	//cout << "E_smooth after zero frame: " << E_smooth << endl;
+  //top and bottom row to zero
+  e_smooth.head_rows(1) = zeros<rowvec>(e_width);
+  e_smooth.tail_rows(1) = zeros<rowvec>(e_width);
 
+  //left and right col to zero
+  e_smooth.head_cols(1) = zeros<vec>(e_height);
+  e_smooth.tail_cols(1) = zeros<vec>(e_height);
 
+  cout << "e_smooth after zero frame: " << endl << e_smooth << endl;
 
 	// M: tmp = repmat( 1 : 2 * ht * wt, 6, 1 ) ;
 	// M: ros = tmp(:);
