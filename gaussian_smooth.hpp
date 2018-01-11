@@ -32,15 +32,15 @@ mat g_smooth (mat img, double scale){
 	grid /= sum(grid);
 
 	//ISSUE HERE
-	smooth_img = conv2(grid, grid, img, "same"); //cannot perform this with armadillo
-
-	//non-matrices: endthresh, maxMaskSize, sigma, scale factor
-	//vectors: lim, grid
-	//img is in 3d in matlab rgb
-
-
-	//how do I make this bilinear??
-	smooth_img.resize()
+	//conv2(u,v,A) first convolves each column of A with the vector u, and then it convolves each row of the result with the vector v.
+	for(int i = 0; i < img.n_cols; i++){
+		conv2(grid, img.col(i), "same");
+	}
+	for(int i = 0; i < img.n_rows; i++){
+		conv2(grid, img.row(i), "same");
+	}
+	//smooth_img = conv2(grid, grid, img, "same"); //cannot perform this with armadillo
+	smooth_img = imresize(g_smooth, scale_factor, 'bilinear', 0);
 
 return smooth_img;
 }
