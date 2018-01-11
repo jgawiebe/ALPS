@@ -39,8 +39,7 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	// M: ros = tmp(:);
 	int temp4repmat = 2*height*width*6;
 	int tempPop = 1;
-	//this syntax does not work
-	//vec rows = (temp4repmat); 
+
 
 	vec rows(temp4repmat); //column vector of size temp4repmat
 
@@ -50,8 +49,51 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 			tempPop++;
 		}
 	}
-
+   /////////////////Where I started 11 Jan 2018////////////////////
 	//M:cols = rows
+	vec cols = rows;
+
+	//M:vals = zeros( size( rows ) )
+	mat vals(size(rows), fill::zeros);
+
+	//MatLab is 1 indexed and C++ is 0 indexed. So thats why i in the
+	//loop is 1 less than in the Matlab comment.
+	//M:cols(1:6:end) = rows(1:6:end) - 2 * ht ;	% x-1
+	for (int i = 0; i<temp4repmat ; i=i+6){
+			cols(i) = rows(i) - (2*height);
+	}
+	//M:cols(2:6:end) = rows(2:6:end) - 2 ;			% y-1
+	for (int i = 1; i<temp4repmat ; i=i+6){
+			cols(i) = rows(i) - 2;
+	}
+
+	//M:cols(9:12:end) = rows(9:12:end) - 1 ;		% v
+	for (int i = 8; i<temp4repmat ; i=i+12){
+			cols(i) = rows(i) - 1;
+	}
+
+	//M:cols(4:12:end) = rows(4:12:end) + 1 ;		% u
+	for (int i = 3; i<temp4repmat ; i=i+12){
+			cols(i) = rows(i) + 1;
+	}
+
+	//M:cols(5:6:end) = rows(5:6:end) + 2 ;			% y+1
+	for (int i = 4; i<temp4repmat ; i=i+6){
+			cols(i) = rows(i) + 2;
+	}
+
+	//M:cols(6:6:end) = rows(6:6:end) + 2 * ht ;	% x+1
+	for (int i = 5; i<temp4repmat ; i=i+6){
+			cols(i) = rows(i) + (2*height);
+	}
+
+	//M:E_sum = aE_smooth( 1 : 2 : 2 * ht, 2 : 2 : end ) + aE_smooth( 3 : 2 : end, 2 : 2 : end ) +
+	//aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) + aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
+	mat e_sum(size(e_smooth);
+
+	//wow this is tough... im done for today
+
 
   return;
 }
+
