@@ -8,9 +8,11 @@ Car.bmp
 Car_0.bmp
 
 #visual studio
-.vscode/launch.json
-.vscode/tasks.json
+/.vs
 
 #bash
 test
+
+#windows explorer
+/Thumbs.db
 
