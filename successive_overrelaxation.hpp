@@ -26,7 +26,7 @@ vec successive_overrelaxation (int& failure, mat A, vec x, vec b, double omega, 
 	}
 
 	vec r = b - (A*x);
-	error = norm(r)/norml;
+	double error = norm(r)/norml;
 	if (error < tolerance) {
 		return; //report error
 	}

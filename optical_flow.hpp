@@ -42,7 +42,9 @@ void optical_flow (double alpha, double gamma, double omega, mat u, mat v, int o
 	mat dxx, dxy;
 	mat dyx, dyy;
 
-	//**get ht and wt from size of img_z
+	//get ht and wt from size of img_z
+	int ht = img_z.n_rows;
+	int wt = img_z.n_cols;
 
 	mat du(ht, wt, fill::zeros);
 	mat dv(ht, wt, fill::zeros);
