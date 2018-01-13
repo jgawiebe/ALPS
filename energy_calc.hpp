@@ -60,8 +60,8 @@ mat generate_esmooth (T u, T v){
   mat v_paritaldy = pow(v_dx, 2) + pow(delta_vy, 2); //vypd
 
 
-	//fill odd rows / even columns ( uypd + vypd )
-	//fill even rows / odd columns ( uxpd + vxpd )
+	//fill odd rows and even columns of esmooth with psifunc( uypd + vypd )
+	//fill even rows and odd columns of esmooth with psifunc( uxpd + vxpd )
 
   //FROM MATLAB:
   //psidashFS( 1:2:end, 2:2:end ) = psiDerivative( uypd + vypd ) ;
