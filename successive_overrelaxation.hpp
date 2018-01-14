@@ -14,7 +14,7 @@ using namespace arma;
 //M: sor
 //the solution 'x' is the vector 'duv'
 //failure flag can also be used outside this function
-vec successive_overrelaxation (int& failure, mat A, vec x, vec b, double omega, int inner_iter, double tolerance){
+vec successive_overrelaxation (int& failure, mat A, vec x, vec b, double omega, int inner_iter, vec tolerance){
 	//temp variables for matrix splitting
 	mat M, N;
 	
@@ -26,8 +26,8 @@ vec successive_overrelaxation (int& failure, mat A, vec x, vec b, double omega, 
 	}
 
 	vec r = b - (A*x);
-	double error = norm(r)/norml;
-	if (error < tolerance) {
+	vec error = norm(r.each_col)/norml; //hopfully this loops as expected
+	if (error.each_col < tolerance.each_col) {
 		return; //report error
 	}
 	
@@ -41,16 +41,16 @@ vec successive_overrelaxation (int& failure, mat A, vec x, vec b, double omega, 
 		
 		x = solve(M, approx);
 		error = norm(x - x_initial) / norm(x);
-		if (error <= tolerance) {
+		if (error.each_col <= tolerance.each_col) {
 			break; //approximation is within tolerance
 		}
 	}
 	
 	//what does this effect? b & r aren't used anywhere after this
-	b =/ omega;
+	b = b / omega;
 	r = b - (A * x);
 	
-	if (error > tolerance) {
+	if (error.each_col > tolerance.each_col) {
 		failure = 1; //convergence not found
 	}
 
@@ -62,9 +62,9 @@ void split (mat& M, mat& N, vec& b, mat A, double omega) {
 	//omega is the relaxation scalar
 	double height = A.n_rows;
 	double width = A.n_cols;
-	mat diagA = diag(diag( A ));
+	mat diagA = diagmat(diagmat( A ));
 	
-	b =* omega;
+	b = b * omega;
 	M = omega * (trimatl( A, -1) + diagA);
 	N = -omega * (trimatu(A, 1) + ((1-omega) * diagA));
 }

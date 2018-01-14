@@ -8,6 +8,8 @@ Rev1: Nov 2017
 #include <armadillo>
 #include "gradient.hpp"
 #include "energy_calc.hpp"
+#include "matrix_builder.hpp"
+#include "successive_overrelaxation.hpp"
 
 using namespace std;
 using namespace arma;
@@ -51,6 +53,14 @@ void optical_flow (double alpha, double gamma, double omega, mat u, mat v, int o
 	vec duv(ht * wt * 2, fill::zeros);
 	vec tolerance(ht * wt * 2);
 
+	//check the size of A
+	mat A(ht, wt, fill::zeros);
+
+	//check the size of b
+	vec b(ht * wt * 2, fill::zeros);
+
+
+
 	//DO MATRIX SIZES NEED TO BE INITIALIZED??
 	mat e_data(size(du), fill::zeros);
 	mat e_smooth;
@@ -66,18 +76,17 @@ void optical_flow (double alpha, double gamma, double omega, mat u, mat v, int o
 	tolerance.fill(1e-8); //fill all values with 1e-8
 
 	for(int i = 0; i < outer_iter; i++){
-		mat temp
 
 		//can i call this from another header?
 		//3 term matrix function within psi
-		e_data = psi_function(
+		e_data = psi_function( 
 				pow(img_z + (img2_dx % du) + (img2_dy % dv), 2) +
 				gamma * pow((img_z + (dxx % du) + (dxy % dv) ), 2) +
-				pow(img_dyz + (dxy % du) + (dyy % dv), 2)
-		);
+				pow(img_dyz + (dxy % du) + (dyy % dv), 2));
+
 		e_smooth = generate_esmooth(u + du, v + dv);
 
-		matrix_builder(mat& A, vec& b, img2_dx, img2_dy, img_z, dxx, dxy, dyy, img_dxz, e_data, (alpha * e_smooth), u, v, gamma);
+		build_matrix(A, b, img2_dx, img2_dy, img_z, dxx, dxy, dyy, img_dxz, e_data, (alpha * e_smooth), u, v, gamma);
 
 		successive_overrelaxation(fail_flag, A, duv, b, omega, inner_iter, tolerance);
 

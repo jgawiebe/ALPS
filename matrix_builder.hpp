@@ -89,7 +89,7 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 
 	//M:E_sum = aE_smooth( 1 : 2 : 2 * ht, 2 : 2 : end ) + aE_smooth( 3 : 2 : end, 2 : 2 : end ) +
 	//aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) + aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
-	mat e_sum(size(e_smooth);
+	mat e_sum(size(e_smooth));
 
 	//wow this is tough... im done for today
 
