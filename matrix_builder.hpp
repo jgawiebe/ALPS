@@ -16,7 +16,7 @@ using namespace arma;
 
 //M: constructMatrix
 void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
-		mat dxx, mat dxy, mat dyy, mat img_dxz, mat e_data,
+		mat dxx, mat dxy, mat dyy, mat dxz, mat dyz, mat e_data,
 		mat e_smooth, mat u, mat v, double gamma){
 
 	int height = u.n_rows;
@@ -44,10 +44,10 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	vec rows(temp4repmat); //column vector of size temp4repmat
 
 	for (int i = 0; i<temp4repmat ; i++){
-		rows(i) = tempPop;
 		if(i%6 == 0){
 			tempPop++;
 		}
+		rows(i) = tempPop;
 	}
    /////////////////Where I started 11 Jan 2018////////////////////
 	//M:cols = rows
@@ -86,13 +86,44 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	for (int i = 5; i<temp4repmat ; i=i+6){
 			cols(i) = rows(i) + (2*height);
 	}
+	
+        //start for 14 Jan 17
+	
+	//M:E_sum = (1) aE_smooth( 1 : 2 : 2 * ht, 2 : 2 : end ) + (2)aE_smooth( 3 : 2 : end, 2 : 2 : end ) +...
+	// (3)aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) + (4)aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
+	//loops built around aE_smooth( 3 : 2 : end, 2 : 2 : end ) so the loops indexing matches that
+	//the initial values are 1 less at initialization due to 0 indexing vs 1 indexing
 
-	//M:E_sum = aE_smooth( 1 : 2 : 2 * ht, 2 : 2 : end ) + aE_smooth( 3 : 2 : end, 2 : 2 : end ) +
-	//aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) + aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
-	mat e_sum(size(e_smooth));
+	//through workspace break point analysis it was determined that height and width (components of matrix u)
+	//are never larger than half of the dimensions of e smooth. Therefore, we can use the dimensions of
+	//smooth for e_sum.
 
-	//wow this is tough... im done for today
+	mat e_sum(size(e_smooth), fill::zeros);
+	for (int i = 2; i<e_height ; i=i+2){
+		for (int j = 1; j<e_width ; j=j+2){
+				if ((i < 2*height) && (j <2*width)){
+					e_sum(i,j) += (e_smooth(i,j) + e_smooth(i-1,j+1) + e_smooth(i-2,j) + e_smooth(i-1,j-1)) ; //(2)+(4)+(1)+(3)
+				} else{
+					e_sum(i,j) += (e_smooth(i,j) + e_smooth(i-1,j+1)) ; //(2)+(4)
+				}
+			}//for loop for the columns
+	}//for loop for the rows
 
+	//M:uapp = E_Data .* ( Ikx .^ 2 + gamma * ( Ixx .^ 2 + Ixy .^ 2 ) ) + E_sum ;
+	mat uapp = e_data % (square(img2_dx) + gamma * (square(dxx)+square(dxy))) + e_sum;
+
+	//M:vapp = E_Data .* ( Iky .^ 2 + gamma * ( Iyy .^ 2 + Ixy .^ 2 ) ) + E_sum ;
+	mat vapp = e_data % (square(img2_dy) + gamma * (square(dyy)+square(dxy))) + e_sum;
+
+	//M:uvapp = E_Data .* ( Ikx .* Iky + gamma * ( Ixx .* Ixy + Iyy .* Ixy ) ) ;
+	mat uvapp = e_data % ((img2_dx % img2_dy) + gamma * ((dxx % dxy) + (dyy % dxy)));
+
+	//M:vuapp = E_Data .* ( Ikx .* Iky + gamma * ( Ixx .* Ixy + Iyy .* Ixy ) ) ;
+	// vuapp declaration is the same as the uvapp, therefore vuapp is a duplicate
+	// and will not be used in our C++ implementation of the code.
+	
+	//end for 14 Jan 17
+	
 
   return;
 }
