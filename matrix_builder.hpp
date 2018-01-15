@@ -54,7 +54,7 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	vec cols = rows;
 
 	//M:vals = zeros( size( rows ) )
-	mat vals(size(rows), fill::zeros);
+	vec vals(size(rows), fill::zeros);
 
 	//MatLab is 1 indexed and C++ is 0 indexed. So thats why i in the
 	//loop is 1 less than in the Matlab comment.
@@ -86,9 +86,9 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	for (int i = 5; i<temp4repmat ; i=i+6){
 			cols(i) = rows(i) + (2*height);
 	}
-	
+
         //start for 14 Jan 17
-	
+
 	//M:E_sum = (1) aE_smooth( 1 : 2 : 2 * ht, 2 : 2 : end ) + (2)aE_smooth( 3 : 2 : end, 2 : 2 : end ) +...
 	// (3)aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) + (4)aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
 	//loops built around aE_smooth( 3 : 2 : end, 2 : 2 : end ) so the loops indexing matches that
@@ -98,15 +98,23 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	//are never larger than half of the dimensions of e smooth. Therefore, we can use the dimensions of
 	//smooth for e_sum.
 
+	//THIS WILL NEED MORE WORK AS E_SUM NEEDS TO BE INDEXED DIFFERENTLY THAN E_SMOOTH
+	//I think the ik jk stuff fixes our problem...
 	mat e_sum(size(e_smooth), fill::zeros);
+	int ik = 0;
+	int jk = 0;
+	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS
+		//ONE FOR HEIGHT, ONE FOR WIDTH THEN ONE FOR NEITHER
 	for (int i = 2; i<e_height ; i=i+2){
 		for (int j = 1; j<e_width ; j=j+2){
 				if ((i < 2*height) && (j <2*width)){
-					e_sum(i,j) += (e_smooth(i,j) + e_smooth(i-1,j+1) + e_smooth(i-2,j) + e_smooth(i-1,j-1)) ; //(2)+(4)+(1)+(3)
+					e_sum(ik,jk) += (e_smooth(i,j) + e_smooth(i-1,j+1) + e_smooth(i-2,j) + e_smooth(i-1,j-1)) ; //(2)+(4)+(1)+(3)
 				} else{
-					e_sum(i,j) += (e_smooth(i,j) + e_smooth(i-1,j+1)) ; //(2)+(4)
+					e_sum(ik,jk) += (e_smooth(i,j) + e_smooth(i-1,j+1)) ; //(2)+(4)
 				}
+				jk++;
 			}//for loop for the columns
+		ik++;
 	}//for loop for the rows
 
 	//M:uapp = E_Data .* ( Ikx .^ 2 + gamma * ( Ixx .^ 2 + Ixy .^ 2 ) ) + E_sum ;
@@ -121,10 +129,61 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	//M:vuapp = E_Data .* ( Ikx .* Iky + gamma * ( Ixx .* Ixy + Iyy .* Ixy ) ) ;
 	// vuapp declaration is the same as the uvapp, therefore vuapp is a duplicate
 	// and will not be used in our C++ implementation of the code.
-	
-	//end for 14 Jan 17
-	
 
+	//end for 14 Jan 17
+
+	//start 15 Jan 17
+	//M:vals( 3 : 12 : end ) = uapp(:) ;
+	//M:vals( 10 : 12 : end ) = vapp(:) ;
+	//M:vals( 4 : 12 : end ) = uvapp(:) ;
+	//M:vals( 9 : 12 : end ) = vuapp(:) ;
+
+
+	//4 temp matrixes used in initializing vals,
+	mat tmp1(size(e_smooth), fill::zeros);
+	mat tmp2 = tmp1;
+	mat tmp3 = tmp1;
+	mat tmp4 = tmp1;
+    ik = 0;
+	jk = 0;
+	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS
+	//ONE FOR HEIGHT, ONE FOR WIDTH THEN ONE FOR NEITHER
+	for (int i = 2; i<e_height ; i=i+2){
+			for (int j = 2; j<e_width ; j=j+2){
+					if ((i < 2*height) && (j <2*width)){
+						tmp1(ik,jk) = e_smooth(i-1,j-2); //M:tmp = aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) ;
+						tmp2(ik,jk) = e_smooth(i-1,j); //M:tmp = aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
+					} else{
+						tmp2(ik,jk) = e_smooth(i-1,j);
+					}
+					jk++;
+				}//for loop for the columns
+			ik++;
+		}//for loop for the rows
+
+	vectorise(uapp); //turns matrix into column vector
+	vectorise(vapp);
+	vectorise(uvapp);
+	ik = 0;
+	for (int i = 9; i<temp4repmat ; i=i+12){
+		vals(i-7) = uapp(ik);
+		vals(i)   = vapp(ik);
+		vals(i-6) = uvapp(ik);
+		vals(i-1) = uvapp(ik);
+		ik++;
+	}
+
+	//READ ME: there is three notes that need to be done. they are in CAPS
+	//both have to do with indexing the loops to make sure we are getting the right stuff
+
+	//NOTE THIS WILL NEED TO BE APPLIED TO ALL LOOPS WHEN YOU WORK ON THEM
+	/*The indices of elements are specified via the uword type, which is a
+	 * typedef for an unsigned integer type. When using loops to access
+	 * elements, it's best to use uword instead of int. For example:
+	 * for(uword i=0; i<X.n_elem; ++i) { X(i) = ... }*/
+
+	//STOPPING HERE, LOOK AT THE NOTES AND BUILD THE LAST TWO TEMP MATRIXES
   return;
 }
+
 
