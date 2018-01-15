@@ -1,8 +1,8 @@
 /*
-energy_calc.hpp
-Jacob Wiebe & James Dolman
-Rev1: Nov 2017
-*/
+ energy_calc.hpp
+ Jacob Wiebe & James Dolman
+ Rev1: Nov 2017
+ */
 
 #include <iostream>
 #include <armadillo>
@@ -18,10 +18,10 @@ using namespace arma;
 mat img1_dx, img1_dy;
 mat img2_dx, img2_dy;
 //change matrices
-mat img_z, img_dxz, img_dyz;
+mat img_z, dxz, dyz;
 
 //M: optic_flow
-void compute_derivatives(mat img1, mat img2){
+void compute_derivatives(mat img1, mat img2) {
 
 	//produce primary derivatives of img1
 	gradient(img1_dx, img1_dy, img1);
@@ -38,7 +38,8 @@ void compute_derivatives(mat img1, mat img2){
 }
 
 //M: resolutionProcess
-void optical_flow (double alpha, double gamma, double omega, mat u, mat v, int outer_iter, int inner_iter){
+void optical_flow(double alpha, double gamma, double omega, mat u, mat v,
+		int outer_iter, int inner_iter) {
 	int fail_flag = 0;
 
 	mat dxx, dxy;
@@ -59,13 +60,10 @@ void optical_flow (double alpha, double gamma, double omega, mat u, mat v, int o
 	//check the size of b
 	vec b(ht * wt * 2, fill::zeros);
 
-
-
 	//DO MATRIX SIZES NEED TO BE INITIALIZED??
 	mat e_data(size(du), fill::zeros);
 	mat e_smooth;
 	mat e_init;
-
 
 	//get second derivatives of img2_dx
 	gradient(dxx, dxy, img2_dx);
@@ -75,23 +73,33 @@ void optical_flow (double alpha, double gamma, double omega, mat u, mat v, int o
 
 	tolerance.fill(1e-8); //fill all values with 1e-8
 
-	for(int i = 0; i < outer_iter; i++){
+	for (int i = 0; i < outer_iter; i++) {
 
 		//can i call this from another header?
 		//3 term matrix function within psi
-		e_data = psi_function( 
-				pow(img_z + (img2_dx % du) + (img2_dy % dv), 2) +
-				gamma * pow((img_z + (dxx % du) + (dxy % dv) ), 2) +
-				pow(img_dyz + (dxy % du) + (dyy % dv), 2));
+		e_data = psi_function(
+				pow(img_z + (img2_dx % du) + (img2_dy % dv), 2)
+						+ gamma * pow((img_z + (dxx % du) + (dxy % dv)), 2)
+						+ pow(dyz + (dxy % du) + (dyy % dv), 2));
 
 		e_smooth = generate_esmooth(u + du, v + dv);
 
-		build_matrix(A, b, img2_dx, img2_dy, img_z, dxx, dxy, dyy, img_dxz, e_data, (alpha * e_smooth), u, v, gamma);
+		build_matrix(A, b, img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz,
+				e_data, (alpha * e_smooth), u, v, gamma);
 
-		successive_overrelaxation(fail_flag, A, duv, b, omega, inner_iter, tolerance);
+		successive_overrelaxation(fail_flag, A, duv, b, omega, inner_iter,
+				tolerance);
 
-		//seperate duv into du and dv
+		for (int i = 0; i < duv.n_elem; i = +2) {
+			du(i) = duv(i); //column major ordering puts values in column by column
+		}
 
-		//deal with fail_flag
+		for (int i = 1; i < duv.n_elem; i = +2) {
+			dv(i) = duv(i);
+		}
+
+		if(fail_flag == false) {
+			return;
+		}
 	}
 }
