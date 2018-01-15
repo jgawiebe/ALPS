@@ -27,36 +27,36 @@ mat generate_esmooth (T u, T v){
 	double height = u.n_rows;
 	double width = u.n_cols;
   mat e_smooth(2*height+1, 2*width+1, fill::zeros);
-  mat operator(1, 2);
-  mat operator.t(1, 2);
+  mat temp(1, 2);
+  mat temp.t(1, 2);
 
-  operator(0) = 1;
-  operator(1) = -1;
+  temp(0) = 1;
+  temp(1) = -1;
 
-  mat u_dx = conv2(u, operator);
-  mat v_dx = conv2(v, operator);
+  mat u_dx = conv2(u, temp);
+  mat v_dx = conv2(v, temp);
 
-  mat u_dy = conv2(u, operator.t);
-  mat v_dy = conv2(v, operator.t);
+  mat u_dy = conv2(u, temp.t);
+  mat v_dy = conv2(v, temp.t);
 
-  operator(1) = 1;
+  temp(1) = 1;
 
-  mat u_dx2 = conv2(u_dx, operator/2, "valid");
-  mat v_dx2 = conv2(u_dx, operator/2, "valid");
+  mat u_dx2 = conv2(u_dx, temp/2, "valid");
+  mat v_dx2 = conv2(u_dx, temp/2, "valid");
 
-  mat u_dy2 = conv2(u_dy, operator.t/2, "valid");
-  mat v_dy2 = conv2(u_dy, operator.t/2, "valid");
+  mat u_dy2 = conv2(u_dy, temp.t/2, "valid");
+  mat v_dy2 = conv2(u_dy, temp.t/2, "valid");
 
-  mat delta_ux = conv2(u_dy2, operator/2); //t
+  mat delta_ux = conv2(u_dy2, temp/2); //t
   mat u_paritaldx = pow(u_dx, 2) + pow(delta_ux, 2); //uxpd
 
-  mat delta_uy = conv2(u_dy2, operator.t/2); //t
+  mat delta_uy = conv2(u_dy2, temp.t/2); //t
   mat u_paritaldy = pow(u_dx, 2) + pow(delta_uy, 2); //uypd
 
-  mat delta_vx = conv2(v_dy2, operator/2); //t
+  mat delta_vx = conv2(v_dy2, temp/2); //t
   mat v_paritaldx = pow(v_dx, 2) + pow(delta_vx, 2); //vxpd
 
-  mat delta_vy = conv2(v_dy2, operator.t/2); //t
+  mat delta_vy = conv2(v_dy2, temp.t/2); //t
   mat v_paritaldy = pow(v_dx, 2) + pow(delta_vy, 2); //vypd
 
 
