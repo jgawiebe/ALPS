@@ -7,6 +7,7 @@
 #include <iostream>
 #include <armadillo>
 #include "optical_flow.hpp"
+#include "gaussian_smooth.hpp"
 
 using namespace std;
 using namespace arma;
@@ -17,20 +18,23 @@ using namespace arma;
 int main() {
 
 	//non-matrices: alpha, dt, gamma, ht, i, num_levels, wt
-	double alpha = 30.0, gamma = 80.0;
+	double alpha = 30.0, gamma = 80.0, omega = 1.8; //check omega value
 	int num_levels = 40, outer_iter = 3, inner_iter = 500;
 	
 	double scale_factor = pow(0.95, num_levels);
 	
+	mat du, dv;
+
 	//**get images using opencv**
+	mat image1, image2;
 
 	//get size of image
 	int height = image1.n_rows;
 	int width = image1.n_cols;
 	
 	//perform guassian scaling on images
-	mat img1 = gaussian_smooth(image1, scale_factor);
-	mat img2 = gaussian_smooth(image2, scale_factor);
+	mat img1 = g_smooth(image1, scale_factor);
+	mat img2 = g_smooth(image2, scale_factor);
 	
 	//define u and v matrices
 	mat u(size(img1), fill::zeros);
@@ -53,12 +57,14 @@ int main() {
 		v = v + dv;
 		
 		//scale images to current level of pyramid
-		img1 = guassian_smooth(image1, scale_factor);
-		img2 = guassian_smooth(image2, scale_factor);
+		img1 = g_smooth(image1, scale_factor);
+		img2 = g_smooth(image2, scale_factor);
 		
-		//resize flow to the current resolution
 		//M: u = imresize( u, [size(im1_hr, 1), size(im1_hr, 2)], 'bilinear' );
-		//u.resize()
+		
+		//resize flow to the current resolution (assuming bilinear)
+		u.resize(img1.n_rows, img1.n_cols);
+		v.resize(size(u));
 	}
 
 	return 1;

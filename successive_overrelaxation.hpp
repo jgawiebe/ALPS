@@ -47,7 +47,7 @@ vec successive_overrelaxation (int& failure, mat A, vec x, vec b, double omega, 
 	}
 	
 	//what does this effect? b & r aren't used anywhere after this
-	b = b / omega;
+	b /= omega;
 	r = b - (A * x);
 	
 	if (error.each_col > tolerance.each_col) {
@@ -64,7 +64,7 @@ void split (mat& M, mat& N, vec& b, mat A, double omega) {
 	double width = A.n_cols;
 	mat diagA = diagmat(diagmat( A ));
 	
-	b = b * omega;
+	b *= omega;
 	M = omega * (trimatl( A, -1) + diagA);
 	N = -omega * (trimatu(A, 1) + ((1-omega) * diagA));
 }

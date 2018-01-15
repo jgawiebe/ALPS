@@ -32,9 +32,9 @@ void compute_derivatives(mat img1, mat img2) {
 	//difference between image values
 	img_z = img2 - img1;
 	//difference between image x partial derivatives
-	img_dxz = img2_dx - img1_dx;
+	dxz = img2_dx - img1_dx;
 	//difference between image y partial derivatives
-	img_dyz = img2_dy - img1_dy;
+	dyz = img2_dy - img1_dy;
 }
 
 //M: resolutionProcess
@@ -84,22 +84,21 @@ void optical_flow(double alpha, double gamma, double omega, mat u, mat v,
 
 		e_smooth = generate_esmooth(u + du, v + dv);
 
-		build_matrix(A, b, img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz,
-				e_data, (alpha * e_smooth), u, v, gamma);
+		build_matrix(A, b, img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (alpha * e_smooth), u, v, gamma);
 
 		successive_overrelaxation(fail_flag, A, duv, b, omega, inner_iter,
 				tolerance);
 
-		for (int i = 0; i < duv.n_elem; i = +2) {
+		if(fail_flag == true) {
+			continue; //did not reach convergence, must try again
+		}
+
+		for (int i = 0; i < duv.n_elem; i += 2) {
 			du(i) = duv(i); //column major ordering puts values in column by column
 		}
 
-		for (int i = 1; i < duv.n_elem; i = +2) {
+		for (int i = 1; i < duv.n_elem; i += 2) {
 			dv(i) = duv(i);
-		}
-
-		if(fail_flag == false) {
-			return;
 		}
 	}
 }
