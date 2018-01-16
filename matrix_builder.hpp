@@ -43,7 +43,7 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 
 	vec rows(temp4repmat); //column vector of size temp4repmat
 
-	for (int i = 0; i<temp4repmat ; i++){
+	for (uword i = 0; i<temp4repmat ; i++){
 		if(i%6 == 0){
 			tempPop++;
 		}
@@ -59,31 +59,31 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	//MatLab is 1 indexed and C++ is 0 indexed. So thats why i in the
 	//loop is 1 less than in the Matlab comment.
 	//M:cols(1:6:end) = rows(1:6:end) - 2 * ht ;	% x-1
-	for (int i = 0; i<temp4repmat ; i=i+6){
+	for (uword i = 0; i<temp4repmat ; i=i+6){
 			cols(i) = rows(i) - (2*height);
 	}
 	//M:cols(2:6:end) = rows(2:6:end) - 2 ;			% y-1
-	for (int i = 1; i<temp4repmat ; i=i+6){
+	for (uword i = 1; i<temp4repmat ; i=i+6){
 			cols(i) = rows(i) - 2;
 	}
 
 	//M:cols(9:12:end) = rows(9:12:end) - 1 ;		% v
-	for (int i = 8; i<temp4repmat ; i=i+12){
+	for (uword i = 8; i<temp4repmat ; i=i+12){
 			cols(i) = rows(i) - 1;
 	}
 
 	//M:cols(4:12:end) = rows(4:12:end) + 1 ;		% u
-	for (int i = 3; i<temp4repmat ; i=i+12){
+	for (uword i = 3; i<temp4repmat ; i=i+12){
 			cols(i) = rows(i) + 1;
 	}
 
 	//M:cols(5:6:end) = rows(5:6:end) + 2 ;			% y+1
-	for (int i = 4; i<temp4repmat ; i=i+6){
+	for (uword i = 4; i<temp4repmat ; i=i+6){
 			cols(i) = rows(i) + 2;
 	}
 
 	//M:cols(6:6:end) = rows(6:6:end) + 2 * ht ;	% x+1
-	for (int i = 5; i<temp4repmat ; i=i+6){
+	for (uword i = 5; i<temp4repmat ; i=i+6){
 			cols(i) = rows(i) + (2*height);
 	}
 
@@ -101,12 +101,12 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	//THIS WILL NEED MORE WORK AS E_SUM NEEDS TO BE INDEXED DIFFERENTLY THAN E_SMOOTH
 	//I think the ik jk stuff fixes our problem...
 	mat e_sum(size(e_smooth), fill::zeros);
-	int ik = 0;
-	int jk = 0;
+	uword ik = 0;
+	uword jk = 0;
 	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS
 		//ONE FOR HEIGHT, ONE FOR WIDTH THEN ONE FOR NEITHER
-	for (int i = 2; i<e_height ; i=i+2){
-		for (int j = 1; j<e_width ; j=j+2){
+	for (uword i = 2; i<e_height ; i=i+2){
+		for (uword j = 1; j<e_width ; j=j+2){
 				if ((i < 2*height) && (j <2*width)){
 					e_sum(ik,jk) += (e_smooth(i,j) + e_smooth(i-1,j+1) + e_smooth(i-2,j) + e_smooth(i-1,j-1)) ; //(2)+(4)+(1)+(3)
 				} else{
@@ -138,7 +138,6 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	//M:vals( 4 : 12 : end ) = uvapp(:) ;
 	//M:vals( 9 : 12 : end ) = vuapp(:) ;
 
-
 	//4 temp matrixes used in initializing vals,
 	mat tmp1(size(e_smooth), fill::zeros);
 	mat tmp2 = tmp1;
@@ -148,12 +147,13 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	jk = 0;
 	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS
 	//ONE FOR HEIGHT, ONE FOR WIDTH THEN ONE FOR NEITHER
-	for (int i = 2; i<e_height ; i=i+2){
-			for (int j = 2; j<e_width ; j=j+2){
+	
+	for (uword i = 2; i<e_height ; i=i+2){
+			for (uword j = 2; j<e_width ; j=j+2){
 					if ((i < 2*height) && (j <2*width)){
 						tmp1(ik,jk) = e_smooth(i-1,j-2); //M:tmp = aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) ;
 						tmp2(ik,jk) = e_smooth(i-1,j); //M:tmp = aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
-					} else{
+					} else {
 						tmp2(ik,jk) = e_smooth(i-1,j);
 					}
 					jk++;
@@ -165,7 +165,8 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	vectorise(vapp);
 	vectorise(uvapp);
 	ik = 0;
-	for (int i = 9; i<temp4repmat ; i=i+12){
+	
+	for (uword i = 9; i<temp4repmat ; i=i+12){
 		vals(i-7) = uapp(ik);
 		vals(i)   = vapp(ik);
 		vals(i-6) = uvapp(ik);
@@ -182,7 +183,12 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	 * elements, it's best to use uword instead of int. For example:
 	 * for(uword i=0; i<X.n_elem; ++i) { X(i) = ... }*/
 
-	//STOPPING HERE, LOOK AT THE NOTES AND BUILD THE LAST TWO TEMP MATRIXES
+	//STOPPING HERE 15 Jan, LOOK AT THE NOTES AND BUILD THE LAST TWO TEMP MATRIXES
+	
+	//Just did a quick touch up on the uword loops. Then will also go through the notes on
+	//the if statements when dealing with width and height. 
+	//Finally then calc temp 3 and temp 4. Then finish off creating the vals in the
+	//about for loop. 
   return;
 }
 
