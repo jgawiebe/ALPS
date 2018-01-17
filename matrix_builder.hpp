@@ -142,10 +142,6 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	//end for 14 Jan 17
 
 	//start 15 Jan 17
-	//M:vals( 3 : 12 : end ) = uapp(:) ;
-	//M:vals( 10 : 12 : end ) = vapp(:) ;
-	//M:vals( 4 : 12 : end ) = uvapp(:) ;
-	//M:vals( 9 : 12 : end ) = vuapp(:) ;
 
 	//4 temp matrixes used in initializing vals,
 	mat tmp1(size(e_smooth), fill::zeros); //NOTE NO IT WONT IT WILL BE HALF THE SIZE AS YOU TAKE EVERY 2ND
@@ -184,29 +180,130 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 			ik++;
 		}//for loop for the rows
 
+	//M:vals( 3 : 12 : end ) = uapp(:) ;
+	//M:vals( 10 : 12 : end ) = vapp(:) ;
+	//M:vals( 4 : 12 : end ) = uvapp(:) ;
+	//M:vals( 9 : 12 : end ) = vuapp(:) ;
+
+	//M:vals( 1 : 12 : end ) = -tmp(:) ;
+	//M:vals( 7 : 12 : end ) = -tmp(:) ;
+	//M:vals( 6 : 12 : end ) = -tmp(:) ;
+	//M:vals( 12 : 12 : end ) = -tmp(:) ;
+
+	//M:vals( 2 : 12 : end ) = -tmp(:) ;
+	//M:vals( 8 : 12 : end ) = -tmp(:) ;
+	//M:vals( 5 : 12 : end ) = -tmp(:) ;
+	//M:vals( 11 : 12 : end ) = -tmp(:) ;
+
 	vectorise(uapp); //turns matrix into column vector
 	vectorise(vapp);
 	vectorise(uvapp);
 	ik = 0;
 
-	for (uword i = 9; i<temp4repmat ; i=i+12){
-		vals(i-7) = uapp(ik);
-		vals(i)   = vapp(ik);
-		vals(i-6) = uvapp(ik);
-		vals(i-1) = uvapp(ik);
+	for (uword i = 11; i<temp4repmat ; i=i+12){
+		vals(i-9) = uapp(ik);
+		vals(i-2) = vapp(ik);
+		vals(i-8) = uvapp(ik);
+		vals(i-3) = uvapp(ik);
+
+		vals(i-11)= -(tmp1(ik));
+		vals(i-5) = -(tmp1(ik));
+		vals(i-6) = -(tmp2(ik));
+		vals(i)   = -(tmp2(ik));
+
+		vals(i-10) = -(tmp3(ik));
+		vals(i-4) = -(tmp3(ik));
+		vals(i-7) = -(tmp4(ik));
+		vals(i-1) = -(tmp4(ik));
+
 		ik++;
 	}
 
-	//READ ME: there is three notes that need to be done. they are in CAPS
-	//both have to do with indexing the loops to make sure we are getting the right stuff
-
 	//STOPPING HERE 15 Jan, LOOK AT THE NOTES AND BUILD THE LAST TWO TEMP MATRIXES
 
-	//Just did a quick touch up on the uword loops. Then will also go through the notes on
-	//the if statements when dealing with width and height.
-	//Finally then calc temp 3 and temp 4. Then finish off creating the vals in the
-	//about for loop.
+	//Jan 17 Start: Fixed all notes I had
 
-	// Done temp 3 and temp 4, done the indexing, just onto vals now.
-  return;
+	//M:upad = padarray( u, [1 1] ) ;
+	//M:vpad = padarray( v, [1 1] ) ;
+	mat upad(height + 2, width + 2, fill::zeros);
+	mat upad(v.n_rows + 2, v.n_cols + 2, fill::zeros);
+
+	/*% Computing the constant terms for the first of the Euler Lagrange equations
+	pdfaltsumu = aE_smooth(2:2:end, 1:2:2*wt) .* ( upad(2:ht+1, 1:wt) - upad(2:ht+1, 2:wt+1) ) + ...
+				aE_smooth( 2:2:end, 3:2:end) .* ( upad(2:ht+1, 3:end) - upad(2:ht+1, 2:wt+1) ) + ...
+				aE_smooth( 1:2:2*ht, 2:2:end) .* ( upad(1:ht, 2:wt+1) - upad(2:ht+1, 2:wt+1) ) + ...
+				aE_smooth( 3:2:end, 2:2:end) .* ( upad(3:end, 2:wt+1) - upad(2:ht+1, 2:wt+1) ) ;
+
+				------------------
+				work here
+				------------------
+*/
+	mat pdfaltsumu ....
+/*	% Computing the constant terms for the second of the Euler Lagrange equations
+	pdfaltsumv = aE_smooth(2:2:end, 1:2:2*wt) .* ( vpad(2:ht+1, 1:wt) - vpad(2:ht+1, 2:wt+1) ) + ...
+				aE_smooth( 2:2:end, 3:2:end) .* ( vpad(2:ht+1, 3:end) - vpad(2:ht+1, 2:wt+1) ) + ...
+				aE_smooth( 1:2:2*ht, 2:2:end) .* ( vpad(1:ht, 2:wt+1) - vpad(2:ht+1, 2:wt+1) ) + ...
+				aE_smooth( 3:2:end, 2:2:end) .* ( vpad(3:end, 2:wt+1) - vpad(2:ht+1, 2:wt+1) ) ;
+
+				------------------
+				work here
+				------------------*/
+	mat pdfaltsumv ....
+	//M:constu = E_Data .* ( Ikx .* Ikz + gamma * ( Ixx .* Ixz + Ixy .* Iyz ) ) - pdfaltsumu ;
+	//M:constv = E_Data .* ( Iky .* Ikz + gamma * ( Ixy .* Ixz + Iyy .* Iyz ) ) - pdfaltsumv ;
+	mat constu = e_data % ((img2_dx %  img_z) + gamma * ((dxx % dxz) + (dxy % dyz))) - pdfaltsumu;
+	mat constv = e_data % ((img2_dy %  img_z) + gamma * ((dxy % dxz) + (dyy % dyz))) - pdfaltsumv;
+
+	//M:b = zeros( 2 * ht * wt, 1 ) ;
+	//M:b(1:2:end) = -constu(:) ;
+	//M:b(2:2:end) = -constv(:) ;
+
+	b.zeros(size(2*height*width));
+	vectorise(constu);
+	vectorise(constv);
+
+	ik = 0;
+
+	for (uword i = 1; i<b.n_rows ; i=i+2){
+		b(i) = -(constv(ik));
+		b(i-1) = -(constu(ik));
+		ik++;
+	}
+
+	//M:ind = find(cols > 0) ;
+	//M:rows = rows( ind ) ;
+	//M:cols = cols( ind ) ;
+	//M:vals = vals( ind ) ;
+
+	for (uword i = 0; i<cols.n_rows ; i=i+1){
+		if(cols(i)<= 0){
+			cols.shed_row(i);
+			rows.shed_row(i);
+			vals.shed_row(i);
+		}
+	}
+
+	//M:ind = find(cols < ( 2 * ht * wt + 1 ) ) ;
+	//M:rows = rows( ind ) ;
+	//M:cols = cols( ind ) ;
+	//M:vals = vals( ind ) ;
+	for (uword i = 0; i<cols.n_rows ; i=i+1){
+			if(cols(i)>= (2*height*width+1)){
+				cols.shed_row(i);
+				rows.shed_row(i);
+				vals.shed_row(i);
+			}
+	}
+
+	//M:A = sparse (rows,cols,vals) ;
+	//not sure if the below code will work
+	mat temp(cols.n_rows,3);
+	temp.insert_cols(0, rows);
+	temp.insert_cols(1, cols);
+	temp.insert_cols(2, vals);
+	sp_mat A (temp);
+	//NOTE IF EXPERIENCING INDEXING LOOP ISSUES, CHECK OUT THE SLICES CLASS
+
+	//end Jan 17 - just need to do pdfaltsumv's
+	return;
 }
