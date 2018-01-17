@@ -98,23 +98,32 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	//are never larger than half of the dimensions of e smooth. Therefore, we can use the dimensions of
 	//smooth for e_sum.
 
-	//THIS WILL NEED MORE WORK AS E_SUM NEEDS TO BE INDEXED DIFFERENTLY THAN E_SMOOTH
-	//I think the ik jk stuff fixes our problem...
+	//THIS WILL NEED MORE WORK AS E_SUM NEEDS TO BE INDEXED DIFFERENTLY THAN E_SMOOTH>DONE
 	mat e_sum(size(e_smooth), fill::zeros);
-	uword ik = 0;
-	uword jk = 0;
-	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS
-		//ONE FOR HEIGHT, ONE FOR WIDTH THEN ONE FOR NEITHER
+
+	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS> DONE
 	for (uword i = 2; i<e_height ; i=i+2){
-		for (uword j = 1; j<e_width ; j=j+2){
-				if ((i < 2*height) && (j <2*width)){
-					e_sum(ik,jk) += (e_smooth(i,j) + e_smooth(i-1,j+1) + e_smooth(i-2,j) + e_smooth(i-1,j-1)) ; //(2)+(4)+(1)+(3)
-				} else{
-					e_sum(ik,jk) += (e_smooth(i,j) + e_smooth(i-1,j+1)) ; //(2)+(4)
+		for (uword j = 2; j<e_width ; j=j+2){
+				if (i < 2*height){//ht good
+					if(j <2*width){//ht good //width good
+						e_sum(i,j-1) += (e_smooth(i,j-1); //(2)
+						e_sum(i-1,j) += e_smooth(i-1,j); //(4)
+						e_sum(i-2,j-1) += e_smooth(i-2,j-1); //(1)
+						e_sum(i-1,j-2) += e_smooth(i-1,j-2)); //(3)
+					}else{ //ht good
+						e_sum(i,j-1) += e_smooth(i,j-1);
+						e_sum(i-1,j) += e_smooth(i-1,j);
+						e_sum(i-2,j-1) += e_smooth(i-2,j-1); //(2)+(4)+(1), just height good
+					}
+				} else if(j <2*width){//width good
+					e_sum(i,j-1) += e_smooth(i,j-1)
+					e_sum(i-1,j) += e_smooth(i-1,j)
+					e_sum(i-1,j-2) += e_smooth(i-1,j-2) ; //(2)+(4)+(3), just width good
+				}else{
+					e_sum(i,j-1) += (e_smooth(i,j-1)
+					e_sum(i-1,j) += e_smooth(i-1,j)) ; //(2)+(4), neither height or width good
 				}
-				jk++;
 			}//for loop for the columns
-		ik++;
 	}//for loop for the rows
 
 	//M:uapp = E_Data .* ( Ikx .^ 2 + gamma * ( Ixx .^ 2 + Ixy .^ 2 ) ) + E_sum ;
@@ -139,22 +148,36 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	//M:vals( 9 : 12 : end ) = vuapp(:) ;
 
 	//4 temp matrixes used in initializing vals,
-	mat tmp1(size(e_smooth), fill::zeros);
+	mat tmp1(size(e_smooth), fill::zeros); //NOTE NO IT WONT IT WILL BE HALF THE SIZE AS YOU TAKE EVERY 2ND
 	mat tmp2 = tmp1;
 	mat tmp3 = tmp1;
 	mat tmp4 = tmp1;
-    ik = 0;
-	jk = 0;
-	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS
-	//ONE FOR HEIGHT, ONE FOR WIDTH THEN ONE FOR NEITHER
-	
+	uword ik = 0;
+	uword jk = 0;
+	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS>Done
+	//INDEXING CORRECT HERE AS TMP JUST TAKES EVERY SECOND ONE OF E_SMOOTH
 	for (uword i = 2; i<e_height ; i=i+2){
 			for (uword j = 2; j<e_width ; j=j+2){
-					if ((i < 2*height) && (j <2*width)){
-						tmp1(ik,jk) = e_smooth(i-1,j-2); //M:tmp = aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) ;
-						tmp2(ik,jk) = e_smooth(i-1,j); //M:tmp = aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
-					} else {
-						tmp2(ik,jk) = e_smooth(i-1,j);
+					if (j <2*width){
+						if (i < 2*height){//width good and height good
+							 tmp1(ik,jk) = e_smooth(i-1,j-2); //M:tmp = aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) ;
+							 tmp2(ik,jk) = e_smooth(i-1,j);   //M:tmp = aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
+							 tmp3(ik,jk) = e_smooth(i-2,j-1);//M:tmp = aE_smooth( 1 : 2 : 2 * ht, 2 : 2 : end ) ;
+							 tmp4(ik,jk) = e_smooth(i,j-1);       //M:tmp = aE_smooth( 3 : 2 : end, 2 : 2 : end ) ;
+						} else {//width good
+							 tmp1(ik,jk) = e_smooth(i-1,j-2);
+							 tmp2(ik,jk) = e_smooth(i-1,j);
+							 tmp4(ik,jk) = e_smooth(i,j-1);
+						}
+
+					} else if (i < 2*height) {//height good
+						 tmp2(ik,jk) = e_smooth(i-1,j);
+						 tmp3(ik,jk) = e_smooth(i-2,j-1);
+						 tmp4(ik,jk) = e_smooth(i,j-1);
+
+					} else {//width bad height bad
+						 tmp2(ik,jk) = e_smooth(i-1,j);
+						 tmp4(ik,jk) = e_smooth(i,j-1);
 					}
 					jk++;
 				}//for loop for the columns
@@ -165,7 +188,7 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	vectorise(vapp);
 	vectorise(uvapp);
 	ik = 0;
-	
+
 	for (uword i = 9; i<temp4repmat ; i=i+12){
 		vals(i-7) = uapp(ik);
 		vals(i)   = vapp(ik);
@@ -177,19 +200,13 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	//READ ME: there is three notes that need to be done. they are in CAPS
 	//both have to do with indexing the loops to make sure we are getting the right stuff
 
-	//NOTE THIS WILL NEED TO BE APPLIED TO ALL LOOPS WHEN YOU WORK ON THEM
-	/*The indices of elements are specified via the uword type, which is a
-	 * typedef for an unsigned integer type. When using loops to access
-	 * elements, it's best to use uword instead of int. For example:
-	 * for(uword i=0; i<X.n_elem; ++i) { X(i) = ... }*/
-
 	//STOPPING HERE 15 Jan, LOOK AT THE NOTES AND BUILD THE LAST TWO TEMP MATRIXES
-	
+
 	//Just did a quick touch up on the uword loops. Then will also go through the notes on
-	//the if statements when dealing with width and height. 
+	//the if statements when dealing with width and height.
 	//Finally then calc temp 3 and temp 4. Then finish off creating the vals in the
-	//about for loop. 
+	//about for loop.
+
+	// Done temp 3 and temp 4, done the indexing, just onto vals now.
   return;
 }
-
-
