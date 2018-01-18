@@ -2,6 +2,9 @@
 /.project
 /.autotools
 /.cproject
+RemoteSystemsTempFiles
+Default
+.metadata
 
 #pictures
 Car.bmp
