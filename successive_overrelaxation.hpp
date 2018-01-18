@@ -16,12 +16,12 @@ void split (mat& M, mat& N, vec& b, mat A, double omega);
 //M: sor
 //the solution 'x' is the vector 'duv'
 //failure flag can also be used outside this function
-vec successive_overrelaxation(uword& failure, mat A, vec x, vec b, double omega,
-		uword inner_iter, vec tolerance) {
+vec successive_overrelaxation(uword* failure, mat A, vec x, vec b, double omega,
+		int inner_iter, vec tolerance) {
 	//temp variables for matrix splitting
 	mat M, N;
 
-	failure = 0;
+	*failure = 0;
 
 	double norml = norm(b);
 	if (norml == 0) {
@@ -41,7 +41,7 @@ vec successive_overrelaxation(uword& failure, mat A, vec x, vec b, double omega,
 	split(M, N, b, A, omega);
 
 	//continue to perform approximations until max iterations or accuracy is below the tolerance level
-	for (uword i = 0; i < inner_iter; i++) {
+	for (int i = 0; i < inner_iter; i++) {
 		vec x_initial = x;
 		mat approx = (N * x) + b;
 
@@ -57,7 +57,7 @@ vec successive_overrelaxation(uword& failure, mat A, vec x, vec b, double omega,
 	r = b - (A * x);
 
 	if ( any(error > tolerance) ) {
-		failure = 1; //convergence not found
+		*failure = 1; //convergence not found
 	}
 
 	return x; //solution vector (duv)
