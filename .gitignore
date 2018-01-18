@@ -18,3 +18,7 @@ test
 
 #vs code (linux)
 .vscode/
+/blas_win64_MT.dll
+/blas_win64_MT.lib
+/lapack_win64_MT.dll
+/lapack_win64_MT.lib
