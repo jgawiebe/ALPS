@@ -27,3 +27,5 @@ test
 /lapack_win64_MT.lib
 /Default/
 /RemoteSystemsTempFiles/
+/.settings/
+/.gitignore
