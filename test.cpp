@@ -16,7 +16,7 @@ using namespace std;
 using namespace arma;
 
 int main() {
-	double alpha = 30.0, gamma = 80.0, omega = 1.8; //check omega value
+//	double alpha = 30.0, gamma = 80.0, omega = 1.8; //check omega value
 	int num_levels = 40, outer_iter = 3, inner_iter = 500;
 
 	double scale_factor = pow(0.95, num_levels);
@@ -30,7 +30,7 @@ int main() {
 
 	//get size of image
 	uword height = image1.n_rows;
-	uword width = (image1.n_cols);
+	uword width = image1.n_cols;
 
 	cout << "height: " << height << endl;
 	cout << "width: " << width << endl;

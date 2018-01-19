@@ -35,7 +35,7 @@ mat g_smooth (mat img, double scale){
 	limit = find(ugrid > thresh); //limit should only be whole numbers
 	cout << "limit:\n" << limit << endl;
 	grid = grid(limit); //use limit as indexes for grid elements
-
+	cout << "grid:\n" << grid << endl;
 
 	//double grid_sum = sum(grid);
 	grid = (grid / cumsum(grid, 1)); //element-wise division of sum of each row
