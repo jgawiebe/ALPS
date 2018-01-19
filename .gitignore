@@ -29,3 +29,5 @@ test
 /RemoteSystemsTempFiles/
 /.settings/
 /.gitignore
+/Preference Configuration/
+/Debug/
