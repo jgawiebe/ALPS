@@ -18,45 +18,38 @@ int main() {
 
 	mat du, dv;
 
-	//**get images using opencv**
+	//**get images using opencv that is the ideal thinggg **
 	mat img_vert_norm;
-	mat img_vert_warp;
-    //Know size of horizontal matrix is 607x684
+	umat img_vert_warp;
 
-	img_vert_norm.load("mats/HorizontalBar/hori_norm.mat");
-//	image2.load("mats/main/img2-m.txt");
-//
-//	image1.save("mats/main/img1-c.txt", csv_ascii);
+    /*Know size of horizontal matrix is 607x684 which is the correct resolution
+	for the image.*/
+	img_vert_warp.load("mats/HorizontalBar/myFile.txt");
 
-	//get size of image
-//	uword height = image1.n_rows;
-//	uword width = image1.n_cols;
+	img_vert_warp.save("mats/HorizontalBar/img_vert_warpmyFile",raw_ascii);
+	/*issue here, on inspection of the img_vert_warp matrix it was found that
+	 * it was not the 607x684 matrix it should have been - just like it is in
+	 * matlab. Instead it was a 2965x1 column vector.
+	 *
+	 * IF you simply .load the actual bmp file then what is produced is a
+	 * 155,702x1 column vector. This is better but the 607x684 is still far
+	 * off as that would be a 415,188 row column vector.
+	 *
+	 * Note the myFile.txt method works at least for dimensions and creating a
+	 * matrix structure, img_ver_warp has dimensions 607x684 which is correct.
+	 * This myFile.txt was created in matlab using the command:
+	 * M: c0 = rgb2gray(imread('Horizontal1.bmp'));
+	 * M: dlmwrite('myFile.txt',c0) */
 
-//	cout << "height: " << height << endl;
-//	cout << "width: " << width << endl;
+	//get size of img_vert_warp data structure and print to screen
+	uword height = img_vert_warp.n_rows;
+	uword width = img_vert_warp.n_cols;
+	cout << "height of img_vert_warp: " << height << "  ";
+	cout << "width img_vert_warp: " << width << endl;
 
-//
-//	img1.save("out/img1.txt", arma_ascii);
-//	img2.save("out/img2.txt", arma_ascii);
+
 
 	return 0;
 }
 
-//void simple_readwrite(mat input) {
-//	input.load("mats/img1.mat", raw_ascii);
-//
-//	string buf;
-//	uword i = 0;
-//
-//	ifstream in_mat("in/main_img1.txt");
-//	ofstream out_mat("test_output.txt");
-//
-//	while (getline(in_mat, buf)) {
-//		if (i < input.n_cols) {
-//			out_mat << buf;
-//		} else {
-//			out_mat << endl << buf;
-//		}
-//	}
-//	out_mat.close();
-//}
+
