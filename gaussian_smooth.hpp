@@ -41,21 +41,19 @@ mat g_smooth (mat img, double scale){
 
 	//M: smooth_img = conv2(grid, grid, img, "same");
 	//conv2(u,v,A) first convolves each column of A with the vector u, and then it convolves each row of the result with the vector v.
-	//TEST THIS
-	for(uword i = 0; i < img.n_cols; i++){
-		conv2(grid, img.col(i), "same");
-		cout << i;
-		//cout << img.col(i);
-	}
-	for(uword i = 0; i < img.n_rows; i++){
-		conv2(grid, img.row(i), "same");
-	}
-	
+//	for(uword i = 0; i < img.n_cols; i++){
+//		conv2(grid, smooth_img.col(i), "same");
+//	}
+//	for(uword i = 0; i < img.n_rows; i++){
+//		conv2(grid, smooth_img.row(i), "same");
+//	}
+	smooth_img.save("mats/g_smooth/smooth_img-c.txt", raw_ascii);
+
 	//M: gaussianRescaling
 	//assuming bilinear
 	smooth_img.resize(smooth_img.n_rows * scale_factor, smooth_img.n_cols * scale_factor);
 
-	smooth_img.save("mats/g_smooth/smooth_img-c.txt", csv_ascii);
+
 
 return smooth_img;
 }
