@@ -14,7 +14,7 @@ using namespace arma;
 mat g_smooth (mat img, double scale){
 	int sigma = 1;
 	int mask_size = 100;
-	double thresh = 0.001;
+	float thresh = 0.001;
 	double scale_factor = (1 / scale);
 
 	uvec limit;
@@ -28,18 +28,20 @@ mat g_smooth (mat img, double scale){
 	mat grid = linspace(-mask_size, mask_size, (2 * mask_size) + 1);
 
 	grid = 1 / (sqrt(2*datum::pi) * exp(pow(-grid, 2)/2));
+	grid.save("mats/g_smooth/grid_init-c.txt", csv_ascii);
 
 //	mat thresh(grid);
 //	thresh.fill(0.001);
-	mat ugrid = abs(grid);
+	vec ugrid = abs(grid);
+	cout << "grid initial:\n" << grid << endl;
 	limit = find(ugrid > thresh); //limit should only be whole numbers
 	cout << "limit:\n" << limit << endl;
 	grid = grid(limit); //use limit as indexes for grid elements
-	cout << "grid:\n" << grid << endl;
+	cout << "grid post limit:\n" << grid << endl;
 
 	//double grid_sum = sum(grid);
 	grid = (grid / cumsum(grid, 1)); //element-wise division of sum of each row
-	cout << "grid:\n" << grid << endl;
+	cout << "grid element-wise division:\n" << grid << endl;
 
 
 	//M: smooth_img = conv2(grid, grid, img, "same");
