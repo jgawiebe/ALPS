@@ -25,10 +25,10 @@ int main() {
 
 	//**get images using opencv**
 	mat image1, image2;
-	image1.load("mats/main/img1-m.txt");
-	image2.load("mats/main/img2-m.txt");
-
-	image1.save("mats/main/img1-c.txt", csv_ascii);
+//	image1.load("mats/main/img1-m.txt");
+//	image2.load("mats/main/img2-m.txt");
+//
+//	image1.save("mats/main/img1-c.txt", csv_ascii);
 
 	//get size of image
 	uword height = image1.n_rows;
