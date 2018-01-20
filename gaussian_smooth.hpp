@@ -14,7 +14,7 @@ using namespace arma;
 mat g_smooth (mat img, double scale){
 	int sigma = 1;
 	int mask_size = 100;
-	float thresh = 0.001;
+	float thresh = 1e-9;
 	double scale_factor = (1 / scale);
 
 	uvec limit;
@@ -30,33 +30,32 @@ mat g_smooth (mat img, double scale){
 	grid = 1 / (sqrt(2*datum::pi) * exp(pow(-grid, 2)/2));
 	grid.save("mats/g_smooth/grid_init-c.txt", csv_ascii);
 
-//	mat thresh(grid);
-//	thresh.fill(0.001);
-	vec ugrid = abs(grid);
-	cout << "grid initial:\n" << grid << endl;
-	limit = find(ugrid > thresh); //limit should only be whole numbers
-	cout << "limit:\n" << limit << endl;
+	limit = find(abs(grid) > thresh); //limit should only be whole numbers
+	limit.save("mats/g_smooth/limit-c.txt", csv_ascii);
+
 	grid = grid(limit); //use limit as indexes for grid elements
-	cout << "grid post limit:\n" << grid << endl;
 
 	//double grid_sum = sum(grid);
-	grid = (grid / cumsum(grid, 1)); //element-wise division of sum of each row
-	cout << "grid element-wise division:\n" << grid << endl;
-
+	grid /= accu(grid); //element-wise division of sum of the column
+	cout << "grid:\n" << grid << endl;
 
 	//M: smooth_img = conv2(grid, grid, img, "same");
 	//conv2(u,v,A) first convolves each column of A with the vector u, and then it convolves each row of the result with the vector v.
 	//TEST THIS
-//	for(uword i = 0; i < img.n_cols; i++){
-//		conv2(grid, img.col(i), "same");
-//	}
-//	for(uword i = 0; i < img.n_rows; i++){
-//		conv2(grid, img.row(i), "same");
-//	}
+	for(uword i = 0; i < img.n_cols; i++){
+		conv2(grid, img.col(i), "same");
+		cout << i;
+		//cout << img.col(i);
+	}
+	for(uword i = 0; i < img.n_rows; i++){
+		conv2(grid, img.row(i), "same");
+	}
 	
 	//M: gaussianRescaling
 	//assuming bilinear
-	//smooth_img.resize(smooth_img.n_rows * scale_factor, smooth_img.n_cols * scale_factor);
+	smooth_img.resize(smooth_img.n_rows * scale_factor, smooth_img.n_cols * scale_factor);
+
+	smooth_img.save("mats/g_smooth/smooth_img-c.txt", csv_ascii);
 
 return smooth_img;
 }
