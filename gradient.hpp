@@ -2,6 +2,7 @@
 gradient.hpp
 Jacob Wiebe & James Dolman
 Rev1: Nov 2017
+ Complete: Jan 21 2018
 */
 
 #include <iostream>
@@ -11,11 +12,12 @@ using namespace std;
 using namespace arma;
 
 //M: gaussDeriv
-tuple<mat, mat, mat> gradient(mat x_deriv, mat y_deriv, mat I) {
+tuple<mat, mat> gradient(mat x_deriv, mat y_deriv, mat I) {
   //int sigma = 1;
   int limit = 1000;
   //int variance = 1;
   int denominator = 2;
+	double thresh = 1e-6;
 
   vec numerator, derivative, temp;
 
@@ -30,10 +32,13 @@ tuple<mat, mat, mat> gradient(mat x_deriv, mat y_deriv, mat I) {
 
   //returns vector of 0s because exp(negative) is very close to 0
   derivative = exp(-numerator/denominator) / pow((datum::pi * denominator), 0.5);
-  derivative = derivative % temp;
+	derivative = -derivative % temp;
+	derivative = derivative(find(abs(derivative) > thresh));
 
-	x_deriv = conv2(I, derivative, "same");
-	y_deriv = conv2(I, derivative.t(), "same");
+	derivative.save("mats/gradient/deriv-c.txt", raw_ascii);
 
-	return make_tuple(x_deriv, y_deriv, I);
+	x_deriv = conv2(I, derivative.t(), "same");
+	y_deriv = conv2(I, derivative, "same");
+
+	return make_tuple(x_deriv, y_deriv);
 }
