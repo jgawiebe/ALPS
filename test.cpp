@@ -14,7 +14,7 @@ void derivative_test();
 
 int main() {
 
-//	guass_test();
+	//gauss_test();
 
 	derivative_test();
 
@@ -47,12 +47,18 @@ void derivative_test() {
 	img1.load("mats/g_smooth/img1_smooth-m.txt");
 	img2.load("mats/g_smooth/img2_smooth-m.txt");
 
-	gradient(&img1_dx, &img1_dy, &img1);
+	tie(img1_dx, img1_dy, img1) = gradient(img1_dx, img1_dy, img1);
 
 	img1_dx.save("mats/gradient/img1_dx-c.txt", raw_ascii);
 
-}
+//	mat A(5, 5, fill::ones);
+//	mat B(5, 5, fill::ones);
 
+//	tie(A, B) = test(A, B);
+//
+//	cout << A << endl << B << endl;
+
+}
 
 //void simple_readwrite(mat input) {
 //	input.load("mats/img1.mat", raw_ascii);

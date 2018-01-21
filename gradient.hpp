@@ -11,10 +11,10 @@ using namespace std;
 using namespace arma;
 
 //M: gaussDeriv
-void gradient (mat *x_deriv, mat *y_deriv, mat *I){
-  int sigma = 1;
+tuple<mat, mat, mat> gradient(mat x_deriv, mat y_deriv, mat I) {
+  //int sigma = 1;
   int limit = 1000;
-  int variance = 1;
+  //int variance = 1;
   int denominator = 2;
 
   vec numerator, derivative, temp;
@@ -22,7 +22,6 @@ void gradient (mat *x_deriv, mat *y_deriv, mat *I){
 //	function assumes variance is constant, otherwise use: variance = sigma * sigma;
 	//	denominator = 2 * variance;
 	//	derivative = derivative % (temp / variance);
-
 
 
   //M: gaussDeriv
@@ -33,6 +32,8 @@ void gradient (mat *x_deriv, mat *y_deriv, mat *I){
   derivative = exp(-numerator/denominator) / pow((datum::pi * denominator), 0.5);
   derivative = derivative % temp;
 
-//  *x_deriv = conv2(*I, derivative, "same");
-//  *y_deriv = conv2(*I, derivative.t(), "same");
+	x_deriv = conv2(I, derivative, "same");
+	y_deriv = conv2(I, derivative.t(), "same");
+
+	return make_tuple(x_deriv, y_deriv, I);
 }

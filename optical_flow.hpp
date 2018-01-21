@@ -24,10 +24,10 @@ mat img_z, dxz, dyz;
 void compute_derivatives(mat img1, mat img2) {
 
 	//produce primary derivatives of img1
-	gradient(&img1_dx, &img1_dy, &img1);
+	gradient(img1_dx, img1_dy, img1);
 
 	//produce primary derivatives of img2
-	gradient(&img2_dx, &img2_dy, &img2);
+	gradient(img2_dx, img2_dy, img2);
 
 	//difference between image values
 	img_z = img2 - img1;
@@ -68,10 +68,10 @@ void optical_flow(double alpha, double gamma, double omega, mat u, mat v,
 	mat e_init;
 
 	//get second derivatives of img2_dx
-	gradient(&dxx, &dxy, &img2_dx);
+	gradient(dxx, dxy, img2_dx);
 
 	//get second derivatives of img2_dy
-	gradient(&dyx, &dyy, &img2_dy);
+	gradient(dyx, dyy, img2_dy);
 
 
 
