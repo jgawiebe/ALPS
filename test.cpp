@@ -1,10 +1,3 @@
-/*
- * help.cpp
- *
- *  Created on: Jan 18, 2018
- *      Author: s27508
- */
-
 #include <iostream>
 #include <fstream>
 
@@ -16,35 +9,34 @@
 using namespace std;
 using namespace arma;
 
+void gauss_test();
 void derivative_test();
 
-
 int main() {
-//	double alpha = 30.0, gamma = 80.0, omega = 1.8; //check omega value
-	int num_levels = 40, outer_iter = 3, inner_iter = 500;
 
-	double scale_factor = pow(0.95, num_levels);
+//	guass_test();
 
-	mat du, dv;
-
-	//**get images using opencv**
-	mat image1, image2;
-
-	//TESTING HERE
 	derivative_test();
 
+	return 0;
+}
 
-//	image1.load("mats/main/img1-m.txt");
-//	image2.load("mats/main/img2-m.txt");
-//
-//	image1.save("mats/main/img1-c.txt", csv_ascii);
+void gauss_test() {
 
-	//perform gaussian scaling on images
+	int num_levels = 40;
+	double scale_factor = pow(0.95, num_levels);
+
+	mat image1, image2;
+
+	image1.load("mats/main/img1-m.txt");
+	image2.load("mats/main/img2-m.txt");
+
 	mat img1 = g_smooth(image1, scale_factor);
 //	mat img2 = g_smooth(image2, scale_factor);
 
+	img1.save("mats/g_smooth/img1_smooth-c.txt", raw_ascii);
+//	img2.save("mats/g_smooth/img2_smooth-c.txt", raw_ascii);
 
-	return 0;
 }
 
 void derivative_test() {

@@ -18,12 +18,12 @@ void gradient (mat *x_deriv, mat *y_deriv, mat *I){
   int denominator = 2;
 
   vec numerator, derivative, temp;
-  //ivector itemp, ideriv;
 
-  //function assumes variance is constant, otherwise use:
-    //variance = sigma*sigma;
-    //denominator = 2 * variance;
-    //derivative = derivative % (temp / variance);
+//	function assumes variance is constant, otherwise use: variance = sigma * sigma;
+	//	denominator = 2 * variance;
+	//	derivative = derivative % (temp / variance);
+
+
 
   //M: gaussDeriv
   temp = linspace(-limit, limit, (2 * limit + 1));
@@ -33,6 +33,6 @@ void gradient (mat *x_deriv, mat *y_deriv, mat *I){
   derivative = exp(-numerator/denominator) / pow((datum::pi * denominator), 0.5);
   derivative = derivative % temp;
 
-  *x_deriv = conv2(*I, derivative, "same");
-  *y_deriv = conv2(*I, derivative.t(), "same");
+//  *x_deriv = conv2(*I, derivative, "same");
+//  *y_deriv = conv2(*I, derivative.t(), "same");
 }

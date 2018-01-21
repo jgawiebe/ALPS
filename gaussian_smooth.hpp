@@ -47,7 +47,7 @@ mat g_smooth (mat img, double scale){
 //	for(uword i = 0; i < img.n_rows; i++){
 //		conv2(grid, smooth_img.row(i), "same");
 //	}
-	smooth_img.save("mats/g_smooth/smooth_img-c.txt", raw_ascii);
+	smooth_img.save("mats/g_smooth/img_smooth-c.txt", raw_ascii);
 
 	//M: gaussianRescaling
 	//assuming bilinear
