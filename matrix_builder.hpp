@@ -9,13 +9,13 @@ Rev1: Nov 2017
 
 using namespace std;
 using namespace arma;
-
+//e_smooth.save("mats/test_matrix_builder/Outputs/e_smooth-c", raw_ascii);
 // mat u ;
 // mat e_smooth;
 // int height = 0, width = 0;
 
 //M: constructMatrix
-void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
+tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 		mat dxx, mat dxy, mat dyy, mat dxz, mat dyz, mat e_data,
 		mat e_smooth, mat u, mat v, double gamma){
 
@@ -24,16 +24,16 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 
 	uword e_height = e_smooth.n_rows;
 	uword e_width = e_smooth.n_cols;
-
+//-----------------------------------------------------------------------------------------------
   //top and bottom row to zero
   e_smooth.head_rows(1) = zeros<rowvec>(e_width);
   e_smooth.tail_rows(1) = zeros<rowvec>(e_width);
 
   //left and right col to zero
   e_smooth.head_cols(1) = zeros<vec>(e_height);
-  e_smooth.tail_cols(1) = zeros<vec>(e_height);
+ e_smooth.tail_cols(1) = zeros<vec>(e_height);
+//-------------------------------------------------------------------------------------------------
 
-  cout << "e_smooth after zero frame: " << endl << e_smooth << endl;
 
 	// M: tmp = repmat( 1 : 2 * ht * wt, 6, 1 ) ;
 	// M: ros = tmp(:);
@@ -100,7 +100,7 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 
 	//THIS WILL NEED MORE WORK AS E_SUM NEEDS TO BE INDEXED DIFFERENTLY THAN E_SMOOTH>DONE
 	mat e_sum(size(e_smooth), fill::zeros);
-
+	e_sum.save("mats/test_matrix_builder/Outputs/e_sum-c", raw_ascii);
 	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS> DONE
 	for (uword i = 2; i<e_height ; i=i+2){
 		for (uword j = 2; j<e_width ; j=j+2){
@@ -125,10 +125,16 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 				}
 			}//for loop for the columns
 	}//for loop for the rows
-
+	  cout << "Past First Instance of e_smooth addition " << endl;
+	  cout << "But am I really? " << endl;
+	  cout << "But am I really? " << endl;
+	  cout << "But am I really? " << endl;
+	  cout << "But am I really? " << endl;
+	  cout << "But am I really? " << endl;
+	  cout << "But am I really? " << endl;
 	//M:uapp = E_Data .* ( Ikx .^ 2 + gamma * ( Ixx .^ 2 + Ixy .^ 2 ) ) + E_sum ;
 	mat uapp = e_data % (square(img2_dx) + gamma * (square(dxx)+square(dxy))) + e_sum;
-
+	  cout << "But am I really? " << endl;
 	//M:vapp = E_Data .* ( Iky .^ 2 + gamma * ( Iyy .^ 2 + Ixy .^ 2 ) ) + E_sum ;
 	mat vapp = e_data % (square(img2_dy) + gamma * (square(dyy)+square(dxy))) + e_sum;
 
@@ -180,6 +186,8 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 			ik++;
 		}//for loop for the rows
 
+
+	cout << "Past Second Instance of e_smooth addition " << endl;
 	//M:vals( 3 : 12 : end ) = uapp(:) ;
 	//M:vals( 10 : 12 : end ) = vapp(:) ;
 	//M:vals( 4 : 12 : end ) = uvapp(:) ;
@@ -225,10 +233,10 @@ void build_matrix (mat& A, vec& b, mat img2_dx, mat img2_dy, mat img_z,
 	//M:vpad = padarray( v, [1 1] ) ;
 	mat upad(height + 2, width + 2, fill::zeros);
 	mat vpad(v.n_rows + 2, v.n_cols + 2, fill::zeros);
-
+//--------------------------------------------------------------------------------------
 	upad.submat(1,1,height,width)=u;
 	vpad.submat(1,1,v.n_rows,v.n_cols)=v;
-
+//---------------------------------------------------------------------------------------
 	/*% Computing the constant terms for the first of the Euler Lagrange equations
 	pdfaltsumu = aE_smooth(2:2:end, 1:2:2*wt) .* ( upad(2:ht+1, 1:wt) -  upad(2:ht+1, 2:wt+1) ) + (1)
 				aE_smooth( 2:2:end, 3:2:end) .*  ( upad(2:ht+1, 3:end) - upad(2:ht+1, 2:wt+1) ) + (2)
@@ -353,8 +361,9 @@ mat tmp5 =tmp1;
 	temp.insert_cols(0, rows);
 	temp.insert_cols(1, cols);
 	temp.insert_cols(2, vals);
+	//---------------------------------------------------------------------------
 	A = temp;
-
+//----------------------------------------------------------------------------------
 	//end Jan 17 - just need to do pdfaltsumv's > Done morning of 19th.
-	return;
+	return make_tuple(A,b);
 }
