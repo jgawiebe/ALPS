@@ -58,7 +58,7 @@ void derivative_test() {
 }
 
 void sor_test() {
-	double omega = 1.8;
+	double omega = 1.8, tolerance = 1e-8;
 	int inner_iter = 500;
 	uword fail_flag = 0;
 
@@ -71,11 +71,12 @@ void sor_test() {
 	int ht = img_z.n_rows;
 	int wt = img_z.n_cols;
 
-	mat A(size(img_z)), du, dv;
-	vec duv(ht * wt * 2, fill::zeros);
-	vec tolerance(duv);
+	sp_mat A(size(img_z));
+	trimatl(A);
 
-	tolerance.fill(1e-8);
+	mat du, dv;
+	vec duv(ht * wt * 2, fill::zeros);
+
 
 	successive_overrelaxation(&fail_flag, A, duv, b, omega, inner_iter,
 			tolerance);
