@@ -41,11 +41,11 @@ mat g_smooth (mat img, double scale){
 
 	//M: smooth_img = conv2(grid, grid, img, "same");
 	//conv2(u,v,A) first convolves each column of A with the vector u, and then it convolves each row of the result with the vector v.
-//	for(uword i = 0; i < img.n_cols; i++){
-//		conv2(grid, smooth_img.col(i), "same");
-//	}
+	for (uword i = 0; i < img.n_cols; i++) {
+		smooth_img.col(i) = conv2(grid, smooth_img.col(i), "same");
+	}
 //	for(uword i = 0; i < img.n_rows; i++){
-//		conv2(grid, smooth_img.row(i), "same");
+//		smooth_img.col(i) = conv2(grid, smooth_img.col(i), "same");
 //	}
 
 	smooth_img.save("mats/g_smooth/img_smooth-c.txt", raw_ascii);

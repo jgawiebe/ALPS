@@ -24,6 +24,7 @@ vec successive_overrelaxation(uword* failure, sp_mat A, vec x, vec b,
 	sp_mat M, N; //temp variables for matrix splitting
 	vec error;
 
+
 	double norml = norm(b);
 	if (norml == 0) {
 		norml = 1;
@@ -74,8 +75,8 @@ tuple<sp_mat, sp_mat, vec> split(sp_mat M, sp_mat N, vec b, sp_mat A,
 	sp_mat diagA = diagmat(diagmat(A));
 
 	b *= omega;
-//	M = omega * (trimatl(A, -1) + diagA);
-//	N = -omega * (trimatu(A, 1) + ((1 - omega) * diagA));
+	M = omega * (trimatl(A) + diagA); // -1 parameter
+	N = -omega * (trimatu(A) + ((1 - omega) * diagA)); //1 parameter
 
 	return make_tuple(M, N, b);
 }

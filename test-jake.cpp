@@ -16,11 +16,11 @@ void sor_test();
 
 int main() {
 
-	//gauss_test();
+	gauss_test();
 
 	//derivative_test();
 
-	sor_test();
+	//sor_test();
 
 	return 0;
 }
@@ -68,21 +68,25 @@ void sor_test() {
 	vec b;
 	b.load("mats/sor/b-m.txt");
 
-	int ht = img_z.n_rows;
-	int wt = img_z.n_cols;
+	uword ht = img_z.n_rows;
+	uword wt = img_z.n_cols;
+	uword side_length = (ht * wt * 2);
 
-	sp_mat A(size(img_z));
-	trimatl(A);
+	sp_mat A(side_length, side_length);
+
+	//A.load("mats/sor/A-m.txt");
+
 
 	mat du, dv;
 	vec duv(ht * wt * 2, fill::zeros);
 
 
-	successive_overrelaxation(&fail_flag, A, duv, b, omega, inner_iter,
+	duv = successive_overrelaxation(&fail_flag, A, duv, b, omega, inner_iter,
 			tolerance);
 
 	duv.save("mats/sor/duv-c.txt", raw_ascii);
 }
+
 //void simple_readwrite(mat input) {
 //	input.load("mats/img1.mat", raw_ascii);
 //

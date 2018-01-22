@@ -30,8 +30,7 @@ mat generate_esmooth(mat u, mat v) {
 	mat e_smooth(2 * height + 1, 2 * width + 1, fill::zeros);
 	mat e_temp(e_smooth);
 
-	mat temp(1, 2);
-	mat tr_temp(1, 2); //transposition of temp matrix
+	mat temp(1, 2), tr_temp(1, 2); //transposition of temp matrix
 
 	temp(0) = 1;
 	temp(1) = -1;
