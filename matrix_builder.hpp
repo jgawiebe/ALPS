@@ -99,31 +99,38 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 	//smooth for e_sum.
 
 	//THIS WILL NEED MORE WORK AS E_SUM NEEDS TO BE INDEXED DIFFERENTLY THAN E_SMOOTH>DONE
-	mat e_sum(size(e_smooth), fill::zeros);
+
+	mat e_sum(height , width , fill::zeros);
 	e_sum.save("mats/test_matrix_builder/Outputs/e_sum-c", raw_ascii);
 	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS> DONE
+	uword ik = 0;
+	uword jk = 0;
 	for (uword i = 2; i<e_height ; i=i+2){
 		for (uword j = 2; j<e_width ; j=j+2){
 				if (i < (2*height)){//ht good
 					if(j <(2*width)){//ht good //width good
-						e_sum(i,j-1) += e_smooth(i,j-1); //(2)
-						e_sum(i-1,j) += e_smooth(i-1,j); //(4)
-						e_sum(i-2,j-1) += e_smooth(i-2,j-1); //(1)
-						e_sum(i-1,j-2) += e_smooth(i-1,j-2); //(3)
+						 cout << "But am I really? " <<ik<<jk<< endl;
+						e_sum(ik,jk) += e_smooth(i,j-1); //(2)
+						e_sum(ik,jk) += e_smooth(i-1,j); //(4)
+						e_sum(ik,jk) += e_smooth(i-2,j-1); //(1)
+						e_sum(ik,jk) += e_smooth(i-1,j-2); //(3)
 					}else{ //ht good
-						e_sum(i,j-1) += e_smooth(i,j-1);
-						e_sum(i-1,j) += e_smooth(i-1,j);
-						e_sum(i-2,j-1) += e_smooth(i-2,j-1); //(2)+(4)+(1), just height good
+						e_sum(ik,jk) += e_smooth(i,j-1);
+						e_sum(ik,jk) += e_smooth(i-1,j);
+						e_sum(ik,jk) += e_smooth(i-2,j-1); //(2)+(4)+(1), just height good
 					}
 				} else if(j <(2*width)){//width good
-					e_sum(i,j-1) += e_smooth(i,j-1);
-					e_sum(i-1,j) += e_smooth(i-1,j);
-					e_sum(i-1,j-2) += e_smooth(i-1,j-2); //(2)+(4)+(3), just width good
+					e_sum(ik,jk) += e_smooth(i,j-1);
+					e_sum(ik,jk) += e_smooth(i-1,j);
+					e_sum(ik,jk) += e_smooth(i-1,j-2); //(2)+(4)+(3), just width good
 				}else{
-					e_sum(i,j-1) += e_smooth(i,j-1);
-					e_sum(i-1,j) += e_smooth(i-1,j); //(2)+(4), neither height or width good
+					e_sum(ik,jk) += e_smooth(i,j-1);
+					e_sum(ik,jk) += e_smooth(i-1,j); //(2)+(4), neither height or width good
 				}
+				jk++;
 			}//for loop for the columns
+		jk = 0;
+		ik++;
 	}//for loop for the rows
 	  cout << "Past First Instance of e_smooth addition " << endl;
 	  cout << "But am I really? " << endl;
@@ -150,12 +157,12 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 	//start 15 Jan 17
 
 	//4 temp matrixes used in initializing vals,
-	mat tmp1(size(e_smooth), fill::zeros); //NOTE NO IT WONT IT WILL BE HALF THE SIZE AS YOU TAKE EVERY 2ND
+	mat tmp1(height , width , fill::zeros); //NOTE NO IT WONT IT WILL BE HALF THE SIZE AS YOU TAKE EVERY 2ND
 	mat tmp2 = tmp1;
 	mat tmp3 = tmp1;
 	mat tmp4 = tmp1;
-	uword ik = 0;
-	uword jk = 0;
+	ik = 0;
+    jk = 0;
 	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS>Done
 	//INDEXING CORRECT HERE AS TMP JUST TAKES EVERY SECOND ONE OF E_SMOOTH
 	for (uword i = 2; i<e_height ; i=i+2){
@@ -183,6 +190,7 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 					}
 					jk++;
 				}//for loop for the columns
+			jk = 0;
 			ik++;
 		}//for loop for the rows
 
@@ -243,7 +251,7 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 				aE_smooth( 1:2:2*ht, 2:2:end) .* ( upad(1:ht, 2:wt+1) -  upad(2:ht+1, 2:wt+1) ) + (3)
 				aE_smooth( 3:2:end, 2:2:end) .*  ( upad(3:end, 2:wt+1) - upad(2:ht+1, 2:wt+1) ) ; (4) */
 
-	mat pdfaltsumu( (e_height%2)-1 , (e_width%2)-1, fill::zeros);
+	mat pdfaltsumu( height , width , fill::zeros);
 	mat pdfaltsumv  = pdfaltsumu;
 
 	uvec rowstk1(e_height/2,fill::zeros) ;
