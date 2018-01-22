@@ -2,6 +2,9 @@
 /.project
 /.autotools
 /.cproject
+RemoteSystemsTempFiles
+Default
+.metadata
 
 #pictures
 Car.bmp
@@ -18,3 +21,16 @@ test
 
 #vs code (linux)
 .vscode/
+/blas_win64_MT.dll
+/blas_win64_MT.lib
+/lapack_win64_MT.dll
+/lapack_win64_MT.lib
+/Default/
+/RemoteSystemsTempFiles/
+/.settings/
+/.gitignore
+/Preference Configuration/
+/Debug/
+/debug/
+/fu/
+/mats/

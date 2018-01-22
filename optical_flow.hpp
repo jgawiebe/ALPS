@@ -8,7 +8,7 @@
 #include <armadillo>
 #include "gradient.hpp"
 #include "energy_calc.hpp"
-#include "matrix_builder.hpp"
+//#include "matrix_builder.hpp"
 #include "successive_overrelaxation.hpp"
 
 using namespace std;
@@ -39,8 +39,8 @@ void compute_derivatives(mat img1, mat img2) {
 
 //M: resolutionProcess
 void optical_flow(double alpha, double gamma, double omega, mat u, mat v,
-		int outer_iter, int inner_iter) {
-	int fail_flag = 0;
+	int outer_iter, int inner_iter) {
+	uword fail_flag = 0;
 
 	mat dxx, dxy;
 	mat dyx, dyy;
@@ -53,6 +53,8 @@ void optical_flow(double alpha, double gamma, double omega, mat u, mat v,
 	mat dv(ht, wt, fill::zeros);
 	vec duv(ht * wt * 2, fill::zeros);
 	vec tolerance(ht * wt * 2);
+
+	tolerance.fill(1e-8); //fill all values with 1e-8
 
 	//check the size of A
 	mat A(ht, wt, fill::zeros);
@@ -71,7 +73,7 @@ void optical_flow(double alpha, double gamma, double omega, mat u, mat v,
 	//get second derivatives of img2_dy
 	gradient(dyx, dyy, img2_dy);
 
-	tolerance.fill(1e-8); //fill all values with 1e-8
+
 
 	for (int i = 0; i < outer_iter; i++) {
 
@@ -84,20 +86,19 @@ void optical_flow(double alpha, double gamma, double omega, mat u, mat v,
 
 		e_smooth = generate_esmooth(u + du, v + dv);
 
-		build_matrix(A, b, img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (alpha * e_smooth), u, v, gamma);
+		//build_matrix(A, b, img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (alpha * e_smooth), u, v, gamma);
 
-		successive_overrelaxation(fail_flag, A, duv, b, omega, inner_iter,
-				tolerance);
+		successive_overrelaxation(&fail_flag, A, duv, b, omega, inner_iter, tolerance);
 
 		if(fail_flag == true) {
 			continue; //did not reach convergence, must try again
 		}
 
-		for (int i = 0; i < duv.n_elem; i += 2) {
+		for (uword i = 0; i < duv.n_elem; i += 2) {
 			du(i) = duv(i); //column major ordering puts values in column by column
 		}
 
-		for (int i = 1; i < duv.n_elem; i += 2) {
+		for (uword i = 1; i < duv.n_elem; i += 2) {
 			dv(i) = duv(i);
 		}
 	}

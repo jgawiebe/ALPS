@@ -23,7 +23,7 @@ int main() {
 	
 	double scale_factor = pow(0.95, num_levels);
 	
-	mat du, dv;
+
 
 	//**get images using opencv**
 	mat image1, image2;
@@ -39,6 +39,8 @@ int main() {
 	//define u and v matrices
 	mat u(size(img1), fill::zeros);
 	mat v(size(img1), fill::zeros);
+
+	mat du, dv;
 
 	//check this loop
 	for (int i = 0; i < num_levels; i++) {
