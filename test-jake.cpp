@@ -5,12 +5,14 @@
 
 #include "gaussian_smooth.hpp"
 #include "gradient.hpp"
+#include "successive_overrelaxation.hpp"
 
 using namespace std;
 using namespace arma;
 
 void gauss_test();
 void derivative_test();
+void sor_test();
 
 int main() {
 
@@ -18,7 +20,7 @@ int main() {
 
 	//derivative_test();
 
-
+	sor_test();
 
 	return 0;
 }
@@ -55,6 +57,31 @@ void derivative_test() {
 	img1_dy.save("mats/derivatives/img1_dy-c.txt", raw_ascii);
 }
 
+void sor_test() {
+	double omega = 1.8;
+	int inner_iter = 500;
+	uword fail_flag = 0;
+
+	mat img_z;
+	img_z.load("mats/derivatives/img_z-m.txt");
+
+	vec b;
+	b.load("mats/sor/b-m.txt");
+
+	int ht = img_z.n_rows;
+	int wt = img_z.n_cols;
+
+	mat A(size(img_z)), du, dv;
+	vec duv(ht * wt * 2, fill::zeros);
+	vec tolerance(duv);
+
+	tolerance.fill(1e-8);
+
+	successive_overrelaxation(&fail_flag, A, duv, b, omega, inner_iter,
+			tolerance);
+
+	duv.save("mats/sor/duv-c.txt", raw_ascii);
+}
 //void simple_readwrite(mat input) {
 //	input.load("mats/img1.mat", raw_ascii);
 //

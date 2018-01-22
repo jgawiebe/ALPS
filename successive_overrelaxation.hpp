@@ -18,17 +18,17 @@ tuple<mat, mat, vec> split(mat M, mat N, vec b, mat A, double omega);
 //failure flag can also be used outside this function
 vec successive_overrelaxation(uword* failure, mat A, vec x, vec b, double omega,
 		int inner_iter, vec tolerance) {
-	//temp variables for matrix splitting
-	mat M, N;
 
-	*failure = 0;
+	mat M, N; //temp variables for matrix splitting
 
 	double norml = norm(b);
 	if (norml == 0) {
 		norml = 1;
 	}
 
-	vec r = b - (A * x);
+	vec r(b);
+	cout << r;
+
 	vec error(r.n_cols);
 	error = (norm(r) / norml);
 
@@ -38,7 +38,7 @@ vec successive_overrelaxation(uword* failure, mat A, vec x, vec b, double omega,
 	}
 
 	//M, N are outputs; b is an inout
-	split(M, N, b, A, omega);
+	tie(M, N, b) = split(M, N, b, A, omega);
 
 	//continue to perform approximations until max iterations or accuracy is below the tolerance level
 	for (int i = 0; i < inner_iter; i++) {
@@ -51,6 +51,7 @@ vec successive_overrelaxation(uword* failure, mat A, vec x, vec b, double omega,
 			break; //approximation is within tolerance
 		}
 	}
+	b.save("mats/sor/b-c.txt", raw_ascii);
 
 	//what does this effect? b & r aren't used anywhere after this
 	b /= omega;
@@ -66,8 +67,8 @@ vec successive_overrelaxation(uword* failure, mat A, vec x, vec b, double omega,
 //complete
 tuple<mat, mat, vec> split(mat M, mat N, vec b, mat A, double omega) {
 	//omega is the relaxation scalar
-	double height = A.n_rows;
-	double width = A.n_cols;
+//	double height = A.n_rows;
+//	double width = A.n_cols;
 	mat diagA = diagmat(diagmat(A));
 
 	b *= omega;
