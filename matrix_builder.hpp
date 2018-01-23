@@ -31,7 +31,7 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 
   //left and right col to zero
   e_smooth.head_cols(1) = zeros<vec>(e_height);
- e_smooth.tail_cols(1) = zeros<vec>(e_height);
+  e_smooth.tail_cols(1) = zeros<vec>(e_height);
 //-------------------------------------------------------------------------------------------------
 
 
@@ -44,12 +44,13 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 	vec rows(temp4repmat); //column vector of size temp4repmat
 
 	for (uword i = 0; i<temp4repmat ; i++){
-		if(i%6 == 0){
+		if(i%6 == 0 && i != 0){
 			tempPop++;
 		}
 		rows(i) = tempPop;
 	}
    /////////////////Where I started 11 Jan 2018////////////////////
+
 	//M:cols = rows
 	vec cols = rows;
 
@@ -101,7 +102,7 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 	//THIS WILL NEED MORE WORK AS E_SUM NEEDS TO BE INDEXED DIFFERENTLY THAN E_SMOOTH>DONE
 
 	mat e_sum(height , width , fill::zeros);
-	e_sum.save("mats/test_matrix_builder/Outputs/e_sum-c", raw_ascii);
+
 	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS> DONE
 	uword ik = 0;
 	uword jk = 0;
@@ -109,7 +110,7 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 		for (uword j = 2; j<e_width ; j=j+2){
 				if (i < (2*height)){//ht good
 					if(j <(2*width)){//ht good //width good
-						 cout << "But am I really? " <<ik<<jk<< endl;
+
 						e_sum(ik,jk) += e_smooth(i,j-1); //(2)
 						e_sum(ik,jk) += e_smooth(i-1,j); //(4)
 						e_sum(ik,jk) += e_smooth(i-2,j-1); //(1)
@@ -132,16 +133,11 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 		jk = 0;
 		ik++;
 	}//for loop for the rows
-	  cout << "Past First Instance of e_smooth addition " << endl;
-	  cout << "But am I really? " << endl;
-	  cout << "But am I really? " << endl;
-	  cout << "But am I really? " << endl;
-	  cout << "But am I really? " << endl;
-	  cout << "But am I really? " << endl;
-	  cout << "But am I really? " << endl;
+
+
 	//M:uapp = E_Data .* ( Ikx .^ 2 + gamma * ( Ixx .^ 2 + Ixy .^ 2 ) ) + E_sum ;
 	mat uapp = e_data % (square(img2_dx) + gamma * (square(dxx)+square(dxy))) + e_sum;
-	  cout << "But am I really? " << endl;
+
 	//M:vapp = E_Data .* ( Iky .^ 2 + gamma * ( Iyy .^ 2 + Ixy .^ 2 ) ) + E_sum ;
 	mat vapp = e_data % (square(img2_dy) + gamma * (square(dyy)+square(dxy))) + e_sum;
 
@@ -167,27 +163,11 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 	//INDEXING CORRECT HERE AS TMP JUST TAKES EVERY SECOND ONE OF E_SMOOTH
 	for (uword i = 2; i<e_height ; i=i+2){
 			for (uword j = 2; j<e_width ; j=j+2){
-					if (j <2*width){
-						if (i < 2*height){//width good and height good
-							 tmp1(ik,jk) = e_smooth(i-1,j-2); //M:tmp = aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) ;
-							 tmp2(ik,jk) = e_smooth(i-1,j);   //M:tmp = aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
-							 tmp3(ik,jk) = e_smooth(i-2,j-1);//M:tmp = aE_smooth( 1 : 2 : 2 * ht, 2 : 2 : end ) ;
-							 tmp4(ik,jk) = e_smooth(i,j-1);       //M:tmp = aE_smooth( 3 : 2 : end, 2 : 2 : end ) ;
-						} else {//width good
-							 tmp1(ik,jk) = e_smooth(i-1,j-2);
-							 tmp2(ik,jk) = e_smooth(i-1,j);
-							 tmp4(ik,jk) = e_smooth(i,j-1);
-						}
+				 tmp1(ik,jk) = e_smooth(i-1,j-2); //M:tmp = aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) ;
+				 tmp2(ik,jk) = e_smooth(i-1,j);   //M:tmp = aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
+				 tmp3(ik,jk) = e_smooth(i-2,j-1);//M:tmp = aE_smooth( 1 : 2 : 2 * ht, 2 : 2 : end ) ;
+				 tmp4(ik,jk) = e_smooth(i,j-1);       //M:tmp = aE_smooth( 3 : 2 : end, 2 : 2 : end ) ;
 
-					} else if (i < 2*height) {//height good
-						 tmp2(ik,jk) = e_smooth(i-1,j);
-						 tmp3(ik,jk) = e_smooth(i-2,j-1);
-						 tmp4(ik,jk) = e_smooth(i,j-1);
-
-					} else {//width bad height bad
-						 tmp2(ik,jk) = e_smooth(i-1,j);
-						 tmp4(ik,jk) = e_smooth(i,j-1);
-					}
 					jk++;
 				}//for loop for the columns
 			jk = 0;
@@ -195,7 +175,6 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 		}//for loop for the rows
 
 
-	cout << "Past Second Instance of e_smooth addition " << endl;
 	//M:vals( 3 : 12 : end ) = uapp(:) ;
 	//M:vals( 10 : 12 : end ) = vapp(:) ;
 	//M:vals( 4 : 12 : end ) = uvapp(:) ;
@@ -227,14 +206,14 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 		vals(i-6) = -(tmp2(ik));
 		vals(i)   = -(tmp2(ik));
 
-		vals(i-10) = -(tmp3(ik));
+		vals(i-10)= -(tmp3(ik));
 		vals(i-4) = -(tmp3(ik));
 		vals(i-7) = -(tmp4(ik));
 		vals(i-1) = -(tmp4(ik));
 
 		ik++;
 	}
-
+	//vals.save("mats/test_matrix_builder/Outputs/valsm-c", raw_ascii);
 	//STOPPING HERE 15 Jan, LOOK AT THE NOTES AND BUILD THE LAST TWO TEMP MATRIXES
 	//Jan 17 Start: Fixed all notes I had
 	//M:upad = padarray( u, [1 1] ) ;
@@ -343,12 +322,24 @@ mat tmp5 =tmp1;
 	//M:cols = cols( ind ) ;
 	//M:vals = vals( ind ) ;
 
+
 	for (uword i = 0; i<cols.n_rows ; i=i+1){
-		if(cols(i)<= 0){
-			cols.shed_row(i);
-			rows.shed_row(i);
-			vals.shed_row(i);
-		}
+			if(cols(i) > 0){
+
+			}else{
+				cols.shed_row(i);
+				rows.shed_row(i);
+				vals.shed_row(i);
+			}
+	}
+	for (uword i = 0; i<cols.n_rows ; i=i+1){
+			if(cols(i) > 0){
+
+			}else{
+				cols.shed_row(i);
+				rows.shed_row(i);
+				vals.shed_row(i);
+			}
 	}
 
 	//M:ind = find(cols < ( 2 * ht * wt + 1 ) ) ;
@@ -356,21 +347,47 @@ mat tmp5 =tmp1;
 	//M:cols = cols( ind ) ;
 	//M:vals = vals( ind ) ;
 	for (uword i = 0; i<cols.n_rows ; i=i+1){
-			if(cols(i)>= (2*height*width+1)){
+			if(cols(i) < (2*height*width+1)){
+
+			}else{
+				cols.shed_row(i);
+				rows.shed_row(i);
+				vals.shed_row(i);
+			}
+	}
+	for (uword i = 0; i<cols.n_rows ; i=i+1){
+			if(cols(i) < (2*height*width+1)){
+
+			}else{
 				cols.shed_row(i);
 				rows.shed_row(i);
 				vals.shed_row(i);
 			}
 	}
 
+/*	if(cols(0) > 0 || cols(5) > 0){
+		cout<<"false positive cols(0)"<<cols(0)<<endl;
+		cout<<"false positive cols(5)"<<cols(5)<<endl;
+	}else{
+		cout<<"pass"<<endl;
+		cout<<" positive cols(0)"<<cols(0)<<endl;
+		cout<<" positive cols(5)"<<cols(5)<<endl;
+	}*/
+
+
+	//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
 	//M:A = sparse (rows,cols,vals) ;
 	//not sure if the below code will work
 	mat temp(cols.n_rows,3);
 	temp.insert_cols(0, rows);
 	temp.insert_cols(1, cols);
 	temp.insert_cols(2, vals);
+
+	//rows.save("mats/test_matrix_builder/Outputs/rows-c", raw_ascii);
+	//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
+	//vals.save("mats/test_matrix_builder/Outputs/vals-c", raw_ascii);
 	//---------------------------------------------------------------------------
-	A = temp;
+ 	A=temp;
 //----------------------------------------------------------------------------------
 	//end Jan 17 - just need to do pdfaltsumv's > Done morning of 19th.
 	return make_tuple(A,b);
