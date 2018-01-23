@@ -30,11 +30,13 @@ void gauss_test() {
 
 	mat image1, image2;
 
+
 	image1.load("mats/main/img1-m.txt");
 	image2.load("mats/main/img2-m.txt");
 
 	mat img1 = g_smooth(image1, scale_factor);
 //	mat img2 = g_smooth(image2, scale_factor);
+
 
 	img1.save("mats/g_smooth/img1_smooth-c.txt", raw_ascii);
 //	img2.save("mats/g_smooth/img2_smooth-c.txt", raw_ascii);
