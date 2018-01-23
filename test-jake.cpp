@@ -6,21 +6,24 @@
 #include "gaussian_smooth.hpp"
 #include "gradient.hpp"
 #include "successive_overrelaxation.hpp"
+#include "energy_calc.hpp"
 
 using namespace std;
 using namespace arma;
 
 void gauss_test();
-void derivative_test();
+void gradient_test();
 void sor_test();
+void psi_test();
+void energy_test();
 
 int main() {
 
-	gauss_test();
-
+	//gauss_test();
 	//derivative_test();
-
 	//sor_test();
+	//psi_test();
+	energy_test();
 
 	return 0;
 }
@@ -32,8 +35,8 @@ void gauss_test() {
 
 	mat image1, image2;
 
-	image1.load("mats/main/img1-m.txt");
-	image2.load("mats/main/img2-m.txt");
+	image1.load("mats/main/Horizontal0.txt");
+	image2.load("mats/main/Horizontal1.txt");
 
 	mat img1 = g_smooth(image1, scale_factor);
 //	mat img2 = g_smooth(image2, scale_factor);
@@ -43,7 +46,7 @@ void gauss_test() {
 
 }
 
-void derivative_test() {
+void gradient_test() {
 	mat img1_dx, img1_dy;
 	mat img2_dx, img2_dy;
 	mat img1, img2;
@@ -72,9 +75,9 @@ void sor_test() {
 	uword wt = img_z.n_cols;
 	uword side_length = (ht * wt * 2);
 
-	sp_mat A(side_length, side_length);
+	mat A(side_length, side_length);
 
-	//A.load("mats/sor/A-m.txt");
+	A.load("mats/sor/A-m.txt");
 
 
 	mat du, dv;
@@ -87,21 +90,22 @@ void sor_test() {
 	duv.save("mats/sor/duv-c.txt", raw_ascii);
 }
 
-//void simple_readwrite(mat input) {
-//	input.load("mats/img1.mat", raw_ascii);
-//
-//	string buf;
-//	uword i = 0;
-//
-//	ifstream in_mat("in/main_img1.txt");
-//	ofstream out_mat("test_output.txt");
-//
-//	while (getline(in_mat, buf)) {
-//		if (i < input.n_cols) {
-//			out_mat << buf;
-//		} else {
-//			out_mat << endl << buf;
-//		}
-//	}
-//	out_mat.close();
-//}
+void psi_test() {
+	mat x;
+	x.load("mats/energy/psi_input.txt");
+
+	x = psi_function(x);
+
+	x.save("mats/energy/e_data-c.txt", raw_ascii);
+}
+
+void energy_test() {
+	mat u, v, e_smooth;
+	//vec du, dv; //zero for test 1
+	u.load("mats/energy/u-m.txt");
+	v.load("mats/energy/v-m.txt");
+
+	e_smooth = generate_esmooth(u, v);
+
+	e_smooth.save("mats/energy/e_smooth-c.txt", raw_ascii);
+}

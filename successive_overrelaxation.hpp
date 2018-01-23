@@ -11,17 +11,17 @@
 using namespace std;
 using namespace arma;
 
-tuple<sp_mat, sp_mat, vec> split(sp_mat M, sp_mat N, vec b, sp_mat A,
+tuple<mat, mat, vec> split(mat M, mat N, vec b, mat A,
 		double omega);
 
 //M: sor
 //the solution 'x' is the vector 'duv'
 //failure flag can also be used outside this function
-vec successive_overrelaxation(uword* failure, sp_mat A, vec x, vec b,
+vec successive_overrelaxation(uword* failure, mat A, vec x, vec b,
 		double omega,
 		int inner_iter, double tolerance) {
 
-	sp_mat M, N; //temp variables for matrix splitting
+	mat M, N; //temp variables for matrix splitting
 	vec error;
 
 
@@ -47,7 +47,7 @@ vec successive_overrelaxation(uword* failure, sp_mat A, vec x, vec b,
 		vec x_initial = x;
 		mat approx = (N * x) + b;
 
-		x = spsolve(M, approx);
+		x = solve(M, approx);
 		error = (norm(x - x_initial) / norm(x));
 		if (all(error < tolerance)) {
 			break; //approximation is within tolerance
@@ -67,16 +67,16 @@ vec successive_overrelaxation(uword* failure, sp_mat A, vec x, vec b,
 }
 
 //complete
-tuple<sp_mat, sp_mat, vec> split(sp_mat M, sp_mat N, vec b, sp_mat A,
+tuple<mat, mat, vec> split(mat M, mat N, vec b, mat A,
 		double omega) {
 	//omega is the relaxation scalar
 //	double height = A.n_rows;
 //	double width = A.n_cols;
-	sp_mat diagA = diagmat(diagmat(A));
+	mat diagA = diagmat(diagmat(A));
 
 	b *= omega;
-	M = omega * (trimatl(A) + diagA); // -1 parameter
-	N = -omega * (trimatu(A) + ((1 - omega) * diagA)); //1 parameter
+	M = omega * (trimatl(A, -1) + diagA); // -1 parameter
+	N = -omega * (trimatu(A, 1) + ((1 - omega) * diagA)); //1 parameter
 
 	return make_tuple(M, N, b);
 }

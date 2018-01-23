@@ -15,9 +15,9 @@ mat psi_function(mat x) {
 
 	//M: psiDerivative
 	const double epsilon = 0.001;
-	mat e_psi = 1/ ((2 *(sqrt(x+epsilon))));
+	x = 1 / ((2 * (sqrt(x + epsilon))));
 
-	return e_psi;
+	return x;
 }
 
 //M: computePsidashFS_brox
@@ -34,6 +34,7 @@ mat generate_esmooth(mat u, mat v) {
 
 	temp(0) = 1;
 	temp(1) = -1;
+	tr_temp = temp.t();
 
 	mat u_dx = conv2(u, temp);
 	mat v_dx = conv2(v, temp);
@@ -42,46 +43,68 @@ mat generate_esmooth(mat u, mat v) {
 	mat v_dy = conv2(v, tr_temp);
 
 	temp(1) = 1;
+	tr_temp = temp.t();
 
-	mat u_dx2 = conv2(u_dx, temp / 2, "valid");
-	mat v_dx2 = conv2(u_dx, temp / 2, "valid");
+	mat u_dx2 = conv2(u_dx, temp / 2, "same"); //all "valid"
+	mat v_dx2 = conv2(u_dx, temp / 2, "same");
 
-	mat u_dy2 = conv2(u_dy, tr_temp / 2, "valid");
-	mat v_dy2 = conv2(u_dy, tr_temp / 2, "valid");
+	mat u_dy2 = conv2(u_dy, tr_temp / 2, "same");
+	mat v_dy2 = conv2(u_dy, tr_temp / 2, "same");
 
-	mat delta_ux = conv2(u_dy2, temp / 2);       //t
+//	for (uword col = 0; col < u_dx.n_cols; col++) {
+//		if (!all(u_dx2.col(col))) { //all elements in col are 0
+//			u_dx2.shed_col(col);
+//		}
+//	}
+
+	mat delta_ux = conv2(u_dy2, (temp / 2));       //t
+	//THIS LINE BREAKS CODE
 	mat u_pdx = pow(u_dx, 2) + pow(delta_ux, 2); //uxpd
 
 	mat delta_uy = conv2(u_dy2, tr_temp / 2);     //t
-	mat u_pdy = pow(u_dx, 2) + pow(delta_uy, 2); //uypd
+	//mat u_pdy = pow(u_dx, 2) + pow(delta_uy, 2); //uypd
 
 	mat delta_vx = conv2(v_dy2, temp / 2);       //t
-	mat v_pdx = pow(v_dx, 2) + pow(delta_vx, 2); //vxpd
+	//mat v_pdx = pow(v_dx, 2) + pow(delta_vx, 2); //vxpd
 
 	mat delta_vy = conv2(v_dy2, tr_temp / 2);     //t
-	mat v_pdy = pow(v_dx, 2) + pow(delta_vy, 2); //vypd
+	//mat v_pdy = pow(v_dx, 2) + pow(delta_vy, 2); //vypd
 
+
+//	mat temp_a = psi_function(u_pdy + v_pdy);
+//	mat temp_b = psi_function(u_pdx + v_pdx);
+//
+//	double a = temp_a(0, 0);
+//	double b = temp_b(0, 0);
+//
+//	for (uword row = 0; row < e_smooth.n_rows; row++) {
+//		for (uword col = 0; col < e_smooth.n_cols; col++) {
+//			if ((col % 2) && !(row % 2)) { //odd col, even row
+//				e_smooth.at(row, col) = a;
+//			} else if (!(col % 2) && (row % 2)) { //even col, odd row
+//				e_smooth.at(row, col) = b;
+//			}
+//		}
+//	}
 
 	//PROBLEM HERE WITH INDEXING
-	for (uword col_ix = 0; col_ix < e_smooth.n_cols; col_ix++) {
-		if (col_ix % 2 == 0) { //even column
-			for (uword row_ix = 1; row_ix < e_smooth.n_rows; row_ix += 2) { //increment through odd rows
-				e_temp = psi_function(u_pdy + v_pdy);
-				//e_smooth(row_ix, col_ix) = e_temp(row1, col1);
-			}
-		} else { //odd column
-			for (uword row_ix = 0; row_ix < e_smooth.n_rows; row_ix += 2) { //increment through even rows
-				e_temp = psi_function(u_pdx + v_pdx);
-				//e_smooth(row_ix, col_ix) = e_temp(i2);
-			}
-		}
-	}
+//	for (uword col_ix = 0; col_ix < e_smooth.n_cols; col_ix++) {
+//		if (col_ix % 2 == 0) { //even column
+//			for (uword row_ix = 1; row_ix < e_smooth.n_rows; row_ix += 2) { //increment through odd rows
+//				e_temp = psi_function(u_pdy + v_pdy);
+//				//e_smooth(row_ix, col_ix) = e_temp(row1, col1);
+//			}
+//		} else { //odd column
+//			for (uword row_ix = 0; row_ix < e_smooth.n_rows; row_ix += 2) { //increment through even rows
+//				e_temp = psi_function(u_pdx + v_pdx);
+//				//e_smooth(row_ix, col_ix) = e_temp(i2);
+//			}
+//		}
+//	}
 
 	//FROM MATLAB:
 	//psidashFS( 1:2:end, 2:2:end ) = psiDerivative( uypd + vypd ) ;
 	//psidashFS( 2:2:end, 1:2:end ) = psiDerivative( uxpd + vxpd ) ;
-	//where psidashFS is e_smooth
-	//also e_smooth is huge
 
 	return e_smooth;
 }

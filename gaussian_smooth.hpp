@@ -37,13 +37,13 @@ mat g_smooth (mat img, double scale){
 
 	//double grid_sum = sum(grid);
 	grid /= accu(grid); //element-wise division of sum of the column
-	cout << "grid:\n" << grid << endl;
+	//cout << "grid:\n" << grid << endl;
 
 	//M: smooth_img = conv2(grid, grid, img, "same");
 	//conv2(u,v,A) first convolves each column of A with the vector u, and then it convolves each row of the result with the vector v.
-	for (uword i = 0; i < img.n_cols; i++) {
-		smooth_img.col(i) = conv2(grid, smooth_img.col(i), "same");
-	}
+//	for (uword i = 0; i < img.n_cols; i++) {
+//		smooth_img.col(i) = conv2(grid, smooth_img.col(i), "same");
+//	}
 //	for(uword i = 0; i < img.n_rows; i++){
 //		smooth_img.col(i) = conv2(grid, smooth_img.col(i), "same");
 //	}
@@ -52,7 +52,8 @@ mat g_smooth (mat img, double scale){
 
 	//M: gaussianRescaling
 	//assuming bilinear
-	//smooth_img.resize(smooth_img.n_rows * scale_factor, smooth_img.n_cols * scale_factor);
+	smooth_img.resize(smooth_img.n_rows * scale_factor,
+			smooth_img.n_cols * scale_factor);
 
 
 

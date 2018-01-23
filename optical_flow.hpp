@@ -56,7 +56,7 @@ tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
 
 	vec duv(side_length, fill::zeros);
 
-	sp_mat A(side_length, side_length);
+	mat A(side_length, side_length);
 
 	//check the size of b
 	vec b(side_length, fill::zeros);
@@ -80,9 +80,10 @@ tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
 
 		e_smooth = generate_esmooth(u + du, v + dv);
 
-		//build_matrix(A, b, img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (alpha * e_smooth), u, v, gamma);
+		//tie(A, b) = build_matrix(A, b, img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (alpha * e_smooth), u, v, gamma);
 
-		successive_overrelaxation(&fail_flag, A, duv, b, omega, inner_iter, tolerance);
+		duv = successive_overrelaxation(&fail_flag, A, duv, b, omega,
+				inner_iter, tolerance);
 
 		if(fail_flag == true) {
 			continue; //did not reach convergence, must try again
