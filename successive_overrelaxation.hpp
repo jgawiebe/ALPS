@@ -11,7 +11,7 @@
 using namespace std;
 using namespace arma;
 
-void split (mat& M, mat& N, vec& b, mat A, double omega);
+tuple<mat, mat, vec> split(mat M, mat N, vec b, mat A, double omega);
 
 //M: sor
 //the solution 'x' is the vector 'duv'
@@ -64,7 +64,7 @@ vec successive_overrelaxation(uword* failure, mat A, vec x, vec b, double omega,
 }
 
 //complete
-void split(mat& M, mat& N, vec& b, mat A, double omega) {
+tuple<mat, mat, vec> split(mat M, mat N, vec b, mat A, double omega) {
 	//omega is the relaxation scalar
 	double height = A.n_rows;
 	double width = A.n_cols;
@@ -73,4 +73,6 @@ void split(mat& M, mat& N, vec& b, mat A, double omega) {
 	b *= omega;
 	M = omega * (trimatl(A, -1) + diagA);
 	N = -omega * (trimatu(A, 1) + ((1 - omega) * diagA));
+
+	return make_tuple(M, N, b);
 }
