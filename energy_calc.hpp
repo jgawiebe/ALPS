@@ -25,8 +25,6 @@ mat generate_esmooth(mat u, mat v) {
 	double height = u.n_rows;
 	double width = u.n_cols;
 
-	uword i1 = 0, i2 = 0;
-
 	mat e_smooth(2 * height + 1, 2 * width + 1, fill::zeros);
 	mat e_temp(e_smooth);
 
@@ -46,28 +44,26 @@ mat generate_esmooth(mat u, mat v) {
 	tr_temp = temp.t();
 
 	mat u_dx2 = conv2(u_dx, temp / 2, "same"); //all "valid"
-	mat v_dx2 = conv2(u_dx, temp / 2, "same");
+	mat v_dx2 = conv2(v_dx, temp / 2, "same");
 
-	mat u_dy2 = conv2(u_dy, tr_temp / 2, "same");
-	mat v_dy2 = conv2(u_dy, tr_temp / 2, "same");
+	mat u_dy2 = conv2(u_dy, tr_temp / 2, "same"); //problem here dy adds col
+	mat v_dy2 = conv2(v_dy, tr_temp / 2, "same");
 
-//	for (uword col = 0; col < u_dx.n_cols; col++) {
-//		if (!all(u_dx2.col(col))) { //all elements in col are 0
-//			u_dx2.shed_col(col);
-//		}
-//	}
-
-	mat delta_ux = conv2(u_dy2, (temp / 2));       //t
-	//THIS LINE BREAKS CODE
+	//Must perform 2D conv2 but matrix size doesn't line up
+	mat delta_ux = conv2(u_dy2, (temp / 2));      //t
+	delta_ux.shed_row(u_dy2.n_rows - 1);
 	mat u_pdx = pow(u_dx, 2) + pow(delta_ux, 2); //uxpd
 
-	mat delta_uy = conv2(u_dy2, tr_temp / 2);     //t
+	mat delta_uy = conv2(u_dx2, tr_temp / 2);     //t
+	delta_uy.shed_col(u_dx2.n_cols - 1);
 	//mat u_pdy = pow(u_dx, 2) + pow(delta_uy, 2); //uypd
 
-	mat delta_vx = conv2(v_dy2, temp / 2);       //t
-	//mat v_pdx = pow(v_dx, 2) + pow(delta_vx, 2); //vxpd
+	mat delta_vx = conv2(v_dy2, temp / 2);       //adding row
+	delta_vx.shed_row(v_dy2.n_rows - 1);
+	mat v_pdx = pow(v_dx, 2) + pow(delta_vx, 2); //vxpd
 
-	mat delta_vy = conv2(v_dy2, tr_temp / 2);     //t
+	mat delta_vy = conv2(v_dx2, (tr_temp / 2), "same");     //adding col
+	delta_vy.shed_col(v_dx2.n_cols - 1);
 	//mat v_pdy = pow(v_dx, 2) + pow(delta_vy, 2); //vypd
 
 
