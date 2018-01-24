@@ -15,7 +15,7 @@ using namespace arma;
 //compile with: g++ <funtion>.cpp -o test -O2 -larmadillo; ./test
 
 //M: optic_flow_brox
-int main() {
+int not_main() {
 
 	//non-matrices: alpha, dt, gamma, ht, i, num_levels, wt
 	double alpha = 30.0, gamma = 80.0, omega = 1.8; //check omega value
@@ -23,7 +23,7 @@ int main() {
 	
 	double scale_factor = pow(0.95, num_levels);
 	
-
+	mat du, dv;
 
 	//**get images using opencv**
 	mat image1, image2;
@@ -39,8 +39,6 @@ int main() {
 	//define u and v matrices
 	mat u(size(img1), fill::zeros);
 	mat v(size(img1), fill::zeros);
-
-	mat du, dv;
 
 	//check this loop
 	for (int i = 0; i < num_levels; i++) {

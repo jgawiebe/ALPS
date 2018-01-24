@@ -15,7 +15,7 @@ using namespace std;
 using namespace arma;
 void init_variables();
 
-    sp_mat A;//inspect matlab code, see if these are edited
+    mat A;//inspect matlab code, see if these are edited
 	vec b;
 	mat img2_dx;
 	mat img2_dy;
