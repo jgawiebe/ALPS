@@ -52,7 +52,8 @@ int main() {
 		compute_derivatives(img1, img2);
 		
 		//perform optical_flow to get du and dv
-		optical_flow(alpha, gamma, omega, u, v, outer_iter, inner_iter);
+		tie(u, v, du, dv) = optical_flow(alpha, gamma, omega, u, v, outer_iter,
+				inner_iter);
 		
 		//add incremental change in x and y domain
 		u = u + du;

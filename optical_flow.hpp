@@ -8,7 +8,7 @@
 #include <armadillo>
 #include "gradient.hpp"
 #include "energy_calc.hpp"
-//#include "matrix_builder.hpp"
+#include "matrix_builder.hpp"
 #include "successive_overrelaxation.hpp"
 
 using namespace std;
@@ -38,34 +38,28 @@ void compute_derivatives(mat img1, mat img2) {
 }
 
 //M: resolutionProcess
-void optical_flow(double alpha, double gamma, double omega, mat u, mat v,
+tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
+		mat u, mat v,
 	int outer_iter, int inner_iter) {
 	uword fail_flag = 0;
+	double tolerance = 1e-8;
 
 	mat dxx, dxy;
 	mat dyx, dyy;
+	mat du(img_z), dv(img_z);
+	mat e_smooth, e_data(size(du), fill::zeros);
 
 	//get ht and wt from size of img_z
 	int ht = img_z.n_rows;
 	int wt = img_z.n_cols;
+	uword side_length = (ht * wt * 2);
 
-	mat du(ht, wt, fill::zeros);
-	mat dv(ht, wt, fill::zeros);
-	vec duv(ht * wt * 2, fill::zeros);
-	vec tolerance(ht * wt * 2);
+	vec duv(side_length, fill::zeros);
 
-	tolerance.fill(1e-8); //fill all values with 1e-8
-
-	//check the size of A
-	mat A(ht, wt, fill::zeros);
+	mat A(side_length, side_length);
 
 	//check the size of b
-	vec b(ht * wt * 2, fill::zeros);
-
-	//DO MATRIX SIZES NEED TO BE INITIALIZED??
-	mat e_data(size(du), fill::zeros);
-	mat e_smooth;
-	mat e_init;
+	vec b(side_length, fill::zeros);
 
 	//get second derivatives of img2_dx
 	gradient(dxx, dxy, img2_dx);
@@ -86,9 +80,10 @@ void optical_flow(double alpha, double gamma, double omega, mat u, mat v,
 
 		e_smooth = generate_esmooth(u + du, v + dv);
 
-		//build_matrix(A, b, img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (alpha * e_smooth), u, v, gamma);
+		//tie(A, b) = build_matrix(A, b, img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (alpha * e_smooth), u, v, gamma);
 
-		successive_overrelaxation(&fail_flag, A, duv, b, omega, inner_iter, tolerance);
+		duv = successive_overrelaxation(&fail_flag, A, duv, b, omega,
+				inner_iter, tolerance);
 
 		if(fail_flag == true) {
 			continue; //did not reach convergence, must try again
@@ -102,4 +97,5 @@ void optical_flow(double alpha, double gamma, double omega, mat u, mat v,
 			dv(i) = duv(i);
 		}
 	}
+	return make_tuple(u, v, du, dv);
 }
