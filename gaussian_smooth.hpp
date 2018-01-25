@@ -10,6 +10,7 @@ Rev1: Nov 2017
 using namespace std;
 using namespace arma;
 
+
 //M: guassianSmooth
 mat g_smooth (mat img, double scale){
 	//int sigma = 1;

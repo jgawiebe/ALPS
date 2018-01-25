@@ -52,36 +52,42 @@ mat generate_esmooth(mat u, mat v) {
 	//Must perform 2D conv2 but matrix size doesn't line up
 	mat delta_ux = conv2(u_dy2, (temp / 2));      //t
 	delta_ux.shed_row(u_dy2.n_rows - 1);
-	mat u_pdx = pow(u_dx, 2) + pow(delta_ux, 2); //uxpd
+	mat u_pdx = pow(u_dx.submat(0, 0, u_dx.n_rows - 1, delta_ux.n_cols - 1), 2)
+			+ pow(delta_ux.submat(0, 0, u_dx.n_rows - 1, delta_ux.n_cols - 1),
+					2);
 
 	mat delta_uy = conv2(u_dx2, tr_temp / 2);     //t
 	delta_uy.shed_col(u_dx2.n_cols - 1);
-	//mat u_pdy = pow(u_dx, 2) + pow(delta_uy, 2); //uypd
+	mat u_pdy = pow(u_dy, 2) + pow(delta_uy, 2);
 
 	mat delta_vx = conv2(v_dy2, temp / 2);       //adding row
 	delta_vx.shed_row(v_dy2.n_rows - 1);
-	mat v_pdx = pow(v_dx, 2) + pow(delta_vx, 2); //vxpd
+	mat v_pdx = pow(v_dx.submat(0, 0, v_dx.n_rows - 1, delta_vx.n_cols - 1), 2)
+			+ pow(delta_vx.submat(0, 0, v_dx.n_rows - 1, delta_vx.n_cols - 1),
+					2);
 
-	mat delta_vy = conv2(v_dx2, (tr_temp / 2), "same");     //adding col
+	mat delta_vy = conv2(v_dx2, tr_temp / 2);     //adding col
 	delta_vy.shed_col(v_dx2.n_cols - 1);
-	//mat v_pdy = pow(v_dx, 2) + pow(delta_vy, 2); //vypd
+	mat v_pdy = pow(v_dy.submat(0, 0, delta_vy.n_rows - 1, v_dy.n_cols - 1), 2)
+			+ pow(delta_vy.submat(0, 0, delta_vy.n_rows - 1, v_dy.n_cols - 1),
+					2);
 
 
-//	mat temp_a = psi_function(u_pdy + v_pdy);
-//	mat temp_b = psi_function(u_pdx + v_pdx);
-//
-//	double a = temp_a(0, 0);
-//	double b = temp_b(0, 0);
-//
-//	for (uword row = 0; row < e_smooth.n_rows; row++) {
-//		for (uword col = 0; col < e_smooth.n_cols; col++) {
-//			if ((col % 2) && !(row % 2)) { //odd col, even row
-//				e_smooth.at(row, col) = a;
-//			} else if (!(col % 2) && (row % 2)) { //even col, odd row
-//				e_smooth.at(row, col) = b;
-//			}
-//		}
-//	}
+	mat temp_a = psi_function(u_pdy + v_pdy);
+	mat temp_b = psi_function(u_pdx + v_pdx);
+
+	double a = temp_a(0, 0);
+	double b = temp_b(0, 0);
+
+	for (uword row = 0; row < e_smooth.n_rows; row++) {
+		for (uword col = 0; col < e_smooth.n_cols; col++) {
+			if ((col % 2) && !(row % 2)) { //odd col, even row
+				e_smooth.at(row, col) = a;
+			} else if (!(col % 2) && (row % 2)) { //even col, odd row
+				e_smooth.at(row, col) = b;
+			}
+		}
+	}
 
 	//PROBLEM HERE WITH INDEXING
 //	for (uword col_ix = 0; col_ix < e_smooth.n_cols; col_ix++) {
