@@ -25,8 +25,10 @@ mat generate_esmooth(mat u, mat v) {
 	double height = u.n_rows;
 	double width = u.n_cols;
 
+	uword x = 0, y = 0;
+
 	mat e_smooth(2 * height + 1, 2 * width + 1, fill::zeros);
-	mat e_temp(e_smooth);
+	//mat e_temp(e_smooth);
 
 	mat temp(1, 2), tr_temp(1, 2); //transposition of temp matrix
 
@@ -72,41 +74,51 @@ mat generate_esmooth(mat u, mat v) {
 			+ pow(delta_vy.submat(0, 0, delta_vy.n_rows - 1, v_dy.n_cols - 1),
 					2);
 
+	mat temp_x = psi_function(u_pdx + v_pdx);
+	mat temp_y = psi_function(u_pdy + v_pdy);
 
-	mat temp_a = psi_function(u_pdy + v_pdy);
-	mat temp_b = psi_function(u_pdx + v_pdx);
+//	e_smooth( 1:2:end, 2:2:end ) = psiDerivative( uypd + vypd ) ;
+//	e_smooth( 2:2:end, 1:2:end ) = psiDerivative( uxpd + vxpd ) ;
 
-	double a = temp_a(0, 0);
-	double b = temp_b(0, 0);
-
-	for (uword row = 0; row < e_smooth.n_rows; row++) {
-		for (uword col = 0; col < e_smooth.n_cols; col++) {
-			if ((col % 2) && !(row % 2)) { //odd col, even row
-				e_smooth.at(row, col) = a;
-			} else if (!(col % 2) && (row % 2)) { //even col, odd row
-				e_smooth.at(row, col) = b;
-			}
-		}
-	}
-
-	//PROBLEM HERE WITH INDEXING
-//	for (uword col_ix = 0; col_ix < e_smooth.n_cols; col_ix++) {
-//		if (col_ix % 2 == 0) { //even column
-//			for (uword row_ix = 1; row_ix < e_smooth.n_rows; row_ix += 2) { //increment through odd rows
-//				e_temp = psi_function(u_pdy + v_pdy);
-//				//e_smooth(row_ix, col_ix) = e_temp(row1, col1);
-//			}
-//		} else { //odd column
-//			for (uword row_ix = 0; row_ix < e_smooth.n_rows; row_ix += 2) { //increment through even rows
-//				e_temp = psi_function(u_pdx + v_pdx);
-//				//e_smooth(row_ix, col_ix) = e_temp(i2);
+//	uword y = 0;
+//	uword x = 1;
+//	for (uword row = 0; row < e_smooth.n_rows; row += 2) {
+//		for (uword col = 1; col < e_smooth.n_cols; col += 2) {
+//			x = 1;
+//			e_smooth.at(row, col) = temp_y.at(x, y);
+//			if (x == temp_x.n_cols - 1) {
+//				y++;
+//				//			} else if (y == temp_y.n_rows - 1) {
+//				//				return e_smooth;
+//			} else {
+//				x++;
 //			}
 //		}
 //	}
 
-	//FROM MATLAB:
-	//psidashFS( 1:2:end, 2:2:end ) = psiDerivative( uypd + vypd ) ;
-	//psidashFS( 2:2:end, 1:2:end ) = psiDerivative( uxpd + vxpd ) ;
+	for (uword row = 0; row < e_smooth.n_rows; row++) {
+		for (uword col = 0; col < e_smooth.n_cols; col++) {
+			if ((col % 2) && !(row % 2)) { //odd col, even row
+				e_smooth.at(row, col) = temp_y.at(x, y);
+			} else if (!(col % 2) && (row % 2)) { //even col, odd row
+//				e_smooth.at(row, col) = temp_x.at(x, y);
+			} else {
+				continue; //don't increment x, y if nothing is written
+			}
+			// simple step through matrix
+			if (x == temp_x.n_cols - 1) {
+				x = 0;
+				y++;
+//			} else if (y == temp_y.n_rows - 1) {
+//				return e_smooth;
+			} else {
+				x++;
+			}
+//			if (col == 40) {
+//				e_smooth.save("mats/energy/e_smooth-c.txt", raw_ascii);
+//			}
+		}
 
-	return e_smooth;
+	}
+return e_smooth;
 }
