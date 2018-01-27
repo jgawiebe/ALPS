@@ -66,8 +66,14 @@ int main() {
 		//M: u = imresize( u, [size(im1_hr, 1), size(im1_hr, 2)], 'bilinear' );
 		
 		//resize flow to the current resolution (assuming bilinear)
+		u.load("mats/energy/u-m.txt");
+		v.load("mats/energy/v-m.txt");
+
 		u.resize(img1.n_rows, img1.n_cols);
 		v.resize(size(u));
+
+		u.save("mats/energy/u-c.txt");
+		v.save("mats/energy/v-c.txt");
 	}
 
 	return 1;

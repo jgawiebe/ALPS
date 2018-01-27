@@ -16,6 +16,7 @@ void gradient_test();
 void sor_test();
 void psi_test();
 void energy_test();
+void resize_test();
 
 int main() {
 
@@ -23,7 +24,8 @@ int main() {
 	//derivative_test();
 	//sor_test();
 	//psi_test();
-	energy_test();
+	//energy_test();
+	resize_test();
 
 	return 0;
 }
@@ -79,10 +81,8 @@ void sor_test() {
 
 	A.load("mats/sor/A-m.txt");
 
-
 	mat du, dv;
 	vec duv(ht * wt * 2, fill::zeros);
-
 
 	duv = successive_overrelaxation(&fail_flag, A, duv, b, omega, inner_iter,
 			tolerance);
@@ -108,4 +108,18 @@ void energy_test() {
 	e_smooth = generate_esmooth(u, v);
 
 	e_smooth.save("mats/energy/e_smooth-c.txt", raw_ascii);
+}
+
+void resize_test() {
+	mat u, v, img1;
+
+	img1.load("mats/main/img1-m.txt");
+	u.load("mats/energy/u-m.txt");
+	v.load("mats/energy/v-m.txt");
+
+	u.resize(img1.n_rows, img1.n_cols);
+	v.resize(size(u));
+
+	u.save("mats/main/u-c.txt", raw_ascii);
+	v.save("mats/main/v-c.txt", raw_ascii);
 }
