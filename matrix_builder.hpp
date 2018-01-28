@@ -385,26 +385,22 @@ mat tmp5 =tmp1;
 
 	//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
 	//M:A = sparse (rows,cols,vals) ;
-	//not sure if the below code will work
-	//mat temp(cols.n_rows,3);
-	//temp.insert_cols(0, rows);
-	//temp.insert_cols(1, cols);
-	//temp.insert_cols(2, vals);
+
 
 	//rows.save("mats/test_matrix_builder/OutputsV2/rowsv5-c", raw_ascii);
-//	cols.save("mats/test_matrix_builder/OutputsV2/colsv5-c", raw_ascii);
+    //cols.save("mats/test_matrix_builder/OutputsV2/colsv5-c", raw_ascii);
 	//vals.save("mats/test_matrix_builder/OutputsV2/valsv2-c", raw_ascii);
 	//---------------Create Square Matrix-------------------------------------------
-
-
+	cout<<" SIZE OF COLS"<<cols.n_cols<<endl;
+	cout<<" MAX OF COL S"<<max(cols)<<endl;
+	cout<<" SIZE OF B   "<<b.n_rows<<endl;
 	//do that here
     umat locations = join_cols(rows,cols);
 
     sp_mat C1(locations,vals);
 
     A = C1;
-
-	//cout<<A <<endl; //can be used to prove A is working correctly.
+    cout<<" SIZE OF A  "<<A.n_cols<<endl;
 	//end Jan 17 - just need to do pdfaltsumv's > Done morning of 19th.
 	return make_tuple(A,b);
 }

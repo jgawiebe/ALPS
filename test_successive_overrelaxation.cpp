@@ -43,8 +43,6 @@ void init_variables();
 
 int main() {
 	//testing on matrix builder with new matlab done again, all good!
-
-
 	//Creat new input vectors for test_SOR Then carry on
 
 	init_variables();
