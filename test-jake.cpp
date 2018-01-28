@@ -89,7 +89,7 @@ void rb_sor_test() {
 	mat du, dv;
 	vec duv(ht * wt * 2, fill::zeros);
 
-	tie(duv, fail_flag) = redblack_sor(fail_flag, A, duv, b, omega,
+	tie(duv, fail_flag) = redblack_sor(A, duv, b, omega,
 			inner_iter, tolerance);
 
 	cout << "status: " << fail_flag;

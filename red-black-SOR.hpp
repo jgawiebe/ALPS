@@ -11,35 +11,26 @@
 using namespace std;
 using namespace arma;
 
+
+
+
 //M: sor
 //the solution 'x' is the vector 'duv'
 //failure flag can also be used outside this function
-tuple<vec, bool> redblack_sor(bool failure, mat A, vec x, vec b, double omega,
+tuple<vec, bool> redblack_sor(mat A, vec x, vec b, double omega,
 		int inner_iter, double tolerance) {
 
 	double error;
-	failure = true;
+	double approx = 0, sum = 0;
+	bool failure = true;
 
-	mat M(A);
-	//mat M(A.n_rows + 2, A.n_cols + 2, fill::zeros);
-	//mat M(500, 500, fill::zeros);
-	double approx = 0.0;
+	mat M(A.n_rows + 2, A.n_cols + 2, fill::zeros);
+	mat Mp(M); //M prime
+	M.at(0, 0) = 1.0;
+
 	//M = (A * x) + b;
 
-	for (uword i = 0; i < M.n_rows; i++) {
-		for (uword j = 0; j < M.n_cols; j++) {
-			if (i == 0) {
-				M.at(i, j) = 1.0;
-			} else {
-				M.at(i, j) = approx;
-			}
-		}
-	}
-
-//RED LOOP
-	double sum = 0.0;
-
-	for (int iter = 0; iter <= inner_iter; iter++) {
+	for (int iter = 1; iter <= inner_iter; iter++) {
 		error = 0.0;
 
 		//RED odd cells

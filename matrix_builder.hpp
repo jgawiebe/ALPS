@@ -15,7 +15,6 @@ using namespace arma;
 // int height = 0, width = 0;
 
 //M: constructMatrix
-
 tuple<sp_mat, vec> build_matrix(sp_mat A, vec b, mat img2_dx, mat img2_dy,
 		mat img_z, mat dxx, mat dxy, mat dyy, mat dxz, mat dyz, mat e_data,
 		mat e_smooth, mat u, mat v, double gamma) {
@@ -26,7 +25,6 @@ tuple<sp_mat, vec> build_matrix(sp_mat A, vec b, mat img2_dx, mat img2_dy,
 	uword e_height = e_smooth.n_rows;
 	uword e_width = e_smooth.n_cols;
 //-----------------------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------------------------
 	//top and bottom row to zero
 	e_smooth.head_rows(1) = zeros<rowvec>(e_width);
 	e_smooth.tail_rows(1) = zeros<rowvec>(e_width);
@@ -36,12 +34,14 @@ tuple<sp_mat, vec> build_matrix(sp_mat A, vec b, mat img2_dx, mat img2_dy,
 	e_smooth.tail_cols(1) = zeros<vec>(e_height);
 //-------------------------------------------------------------------------------------------------
 
+
 	// M: tmp = repmat( 1 : 2 * ht * wt, 6, 1 ) ;
 	// M: ros = tmp(:);
 	uword temp4repmat = 2 * height * width * 6;
 	int tempPop = 1;
 
-	vec rows(temp4repmat); //column vector of size temp4repmat
+
+	urowvec rows(temp4repmat); //column vector of size temp4repmat
 
 	for (uword i = 0; i < temp4repmat; i++) {
 		if (i % 6 == 0 && i != 0) {
@@ -52,7 +52,7 @@ tuple<sp_mat, vec> build_matrix(sp_mat A, vec b, mat img2_dx, mat img2_dy,
 	/////////////////Where I started 11 Jan 2018////////////////////
 
 	//M:cols = rows
-	vec cols = rows;
+	urowvec cols = rows;
 
 	//M:vals = zeros( size( rows ) )
 	vec vals(temp4repmat, fill::zeros);
@@ -127,12 +127,13 @@ tuple<sp_mat, vec> build_matrix(sp_mat A, vec b, mat img2_dx, mat img2_dy,
 			} else {
 				e_sum(ik, jk) += e_smooth(i, j - 1);
 				e_sum(ik, jk) += e_smooth(i - 1, j); //(2)+(4), neither height or width good
-			}
+				}
 			jk++;
 		} //for loop for the columns
 		jk = 0;
 		ik++;
 	} //for loop for the rows
+
 
 	//M:uapp = E_Data .* ( Ikx .^ 2 + gamma * ( Ixx .^ 2 + Ixy .^ 2 ) ) + E_sum ;
 	mat uapp = e_data % (square(img2_dx) + gamma * (square(dxx) + square(dxy)))
@@ -175,6 +176,7 @@ tuple<sp_mat, vec> build_matrix(sp_mat A, vec b, mat img2_dx, mat img2_dy,
 		jk = 0;
 		ik++;
 	}       //for loop for the rows
+
 
 	//M:vals( 3 : 12 : end ) = uapp(:) ;
 	//M:vals( 10 : 12 : end ) = vapp(:) ;
@@ -327,21 +329,22 @@ tuple<sp_mat, vec> build_matrix(sp_mat A, vec b, mat img2_dx, mat img2_dy,
 	//M:cols = cols( ind ) ;
 	//M:vals = vals( ind ) ;
 
-	for (uword i = 0; i < cols.n_rows; i = i + 1) {
+
+	for (uword i = 0; i < cols.n_cols; i = i + 1) {
 		if (cols(i) > 0) {
 
 		} else {
-			cols.shed_row(i);
-			rows.shed_row(i);
+			cols.shed_col(i);
+			rows.shed_col(i);
 			vals.shed_row(i);
 		}
 	}
-	for (uword i = 0; i < cols.n_rows; i = i + 1) {
+	for (uword i = 0; i < cols.n_cols; i = i + 1) {
 		if (cols(i) > 0) {
 
 		} else {
-			cols.shed_row(i);
-			rows.shed_row(i);
+			cols.shed_col(i);
+			rows.shed_col(i);
 			vals.shed_row(i);
 		}
 	}
@@ -350,100 +353,61 @@ tuple<sp_mat, vec> build_matrix(sp_mat A, vec b, mat img2_dx, mat img2_dy,
 	//M:rows = rows( ind ) ;
 	//M:cols = cols( ind ) ;
 	//M:vals = vals( ind ) ;
-	for (uword i = 0; i < cols.n_rows; i = i + 1) {
+	for (uword i = 0; i < cols.n_cols; i = i + 1) {
 		if (cols(i) < (2 * height * width + 1)) {
 
 		} else {
-			cols.shed_row(i);
-			rows.shed_row(i);
+			cols.shed_col(i);
+			rows.shed_col(i);
 			vals.shed_row(i);
 		}
 	}
-	for (uword i = 0; i < cols.n_rows; i = i + 1) {
+	for (uword i = 0; i < cols.n_cols; i = i + 1) {
 		if (cols(i) < (2 * height * width + 1)) {
 
 		} else {
-			cols.shed_row(i);
-			rows.shed_row(i);
-			for (uword i = 0; i < cols.n_cols; i = i + 1) {
-				if (cols(i) < (2 * height * width + 1)) {
-
-				} else {
-					cols.shed_col(i);
-					rows.shed_col(i);
-					vals.shed_row(i);
-				}
+			cols.shed_col(i);
+			rows.shed_col(i);
+			vals.shed_row(i);
 			}
-			for (uword i = 0; i < cols.n_cols; i = i + 1) {
-				if (cols(i) < (2 * height * width + 1)) {
-
-				} else {
-					cols.shed_col(i);
-					rows.shed_col(i);
-					vals.shed_row(i);
-				}
-			}
-
-			/*	if(cols(0) > 0 || cols(5) > 0){
-			 cout<<"false positive cols(0)"<<cols(0)<<endl;
-			 cout<<"false positive cols(5)"<<cols(5)<<endl;
-			 }else{
-			 cout<<"pass"<<endl;
-			 cout<<" positive cols(0)"<<cols(0)<<endl;
-			 cout<<" positive cols(5)"<<cols(5)<<endl;
-			 }*/
-
-			//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
-			for (uword i = 0; i < cols.n_cols; i = i + 1) {
-
-				cols(i) = cols(i) - 1;
-				rows(i) = rows(i) - 1;
-
-			}
-
-			/*	if(cols(0) > 0 || cols(5) > 0){
-			 cout<<"false positive cols(0)"<<cols(0)<<endl;
-			 cout<<"false positive cols(5)"<<cols(5)<<endl;
-			 }else{
-			 cout<<"pass"<<endl;
-			 cout<<" positive cols(0)"<<cols(0)<<endl;
-			 cout<<" positive cols(5)"<<cols(5)<<endl;
-			 }*/
-
-			//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
-			//M:A = sparse (rows,cols,vals) ;
-			//not sure if the below code will work
-			mat temp(cols.n_rows, 3);
-			temp.insert_cols(0, rows);
-			temp.insert_cols(1, cols);
-			temp.insert_cols(2, vals);
-			//mat temp(cols.n_rows,3);
-			//temp.insert_cols(0, rows);
-			//temp.insert_cols(1, cols);
-			//temp.insert_cols(2, vals);
-
-			//rows.save("mats/test_matrix_builder/OutputsV2/rowsv5-c", raw_ascii);
-//	cols.save("mats/test_matrix_builder/OutputsV2/colsv5-c", raw_ascii);
-			//vals.save("mats/test_matrix_builder/OutputsV2/valsv2-c", raw_ascii);
-			//---------------Create Square Matrix-------------------------------------------
-
-			//do that here
-			umat locations = join_cols(rows, cols);
-
-			sp_mat C1(locations, vals);
-
-			A = C1;
-
-			//rows.save("mats/test_matrix_builder/Outputs/rows-c", raw_ascii);
-			//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
-			//vals.save("mats/test_matrix_builder/Outputs/vals-c", raw_ascii);
-			//---------------------------------------------------------------------------
-			A = temp;
-//----------------------------------------------------------------------------------
-			//cout<<A <<endl; //can be used to prove A is working correctly.
-			//end Jan 17 - just need to do pdfaltsumv's > Done morning of 19th.
-
-		}
 	}
+
+	for (uword i = 0; i < cols.n_cols; i = i + 1) {
+
+		cols(i) = cols(i) - 1;
+		rows(i) = rows(i) - 1;
+
+
+	}
+
+	/*	if(cols(0) > 0 || cols(5) > 0){
+	 cout<<"false positive cols(0)"<<cols(0)<<endl;
+	 cout<<"false positive cols(5)"<<cols(5)<<endl;
+	 }else{
+	 cout<<"pass"<<endl;
+	 cout<<" positive cols(0)"<<cols(0)<<endl;
+	 cout<<" positive cols(5)"<<cols(5)<<endl;
+	 }*/
+
+
+	//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
+	//M:A = sparse (rows,cols,vals) ;
+
+
+	//rows.save("mats/test_matrix_builder/OutputsV2/rowsv5-c", raw_ascii);
+	//cols.save("mats/test_matrix_builder/OutputsV2/colsv5-c", raw_ascii);
+	//vals.save("mats/test_matrix_builder/OutputsV2/valsv2-c", raw_ascii);
+	//---------------Create Square Matrix-------------------------------------------
+	cout << " SIZE OF COLS" << cols.n_cols << endl;
+	cout << " MAX OF COL S" << max(cols) << endl;
+	cout << " SIZE OF B   " << b.n_rows << endl;
+	//do that here
+	umat locations = join_cols(rows, cols);
+
+	sp_mat C1(locations, vals);
+
+	A = C1;
+	cout << " SIZE OF A  " << A.n_cols << endl;
+	//end Jan 17 - just need to do pdfaltsumv's > Done morning of 19th.
 	return make_tuple(A, b);
 }
