@@ -42,12 +42,30 @@ int main() {
 	 * checked an so on. The notes for this portion of the lab should be very
 	 * robust.  */
 	init_variables();
+<<<<<<< HEAD
 
 	//get size of img_vert_warp data structure and print to screen
 
 
 	tie(A,b) = build_matrix( A, b,img2_dx,img2_dy,img_z,dxx, dxy, dyy, dxz, dyz, e_data,e_smooth, u, v, gam);
 
+=======
+	mat smallA;
+	//get size of img_vert_warp data structure and print to screen
+
+
+	tie(A,b) = build_matrix( A, b,img2_dx,img2_dy,img_z,dxx, dxy, dyy, dxz, dyz, e_data,e_smooth, u, v, gam);
+	//b produces exact information. 22/jan/18 NO EDITS TO B
+	//b.save("mats/test_matrix_builder/Outputs/b-c", raw_ascii);
+	//A.save("mats/test_matrix_builder/Outputs/A_sp-c", raw_ascii);
+
+	//uword height = A.n_rows;
+	//uword width  = A.n_cols;
+	//cout<<"height"<< height << "   width"<< width<<endl;
+	//smallA = A.submat(0,0,99,99);
+	//smallA.save("mats/test_matrix_builder/Outputs/smallA-c", raw_ascii);
+	//create print of what A's dimensions are
+>>>>>>> refs/remotes/origin/james
 	return 0;
 }
 

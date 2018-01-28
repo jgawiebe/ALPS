@@ -8,7 +8,6 @@
 #include "successive_overrelaxation.hpp"
 #include "energy_calc.hpp"
 #include "red-black-SOR.hpp"
-
 using namespace std;
 using namespace arma;
 
@@ -66,33 +65,7 @@ void gradient_test() {
 	img1_dy.save("mats/derivatives/img1_dy-c.txt", raw_ascii);
 }
 
-void sor_test() {
-	double omega = 1.8, tolerance = 1e-8;
-	int inner_iter = 500;
-	uword fail_flag = 0;
 
-	mat img_z;
-	img_z.load("mats/derivatives/img_z-m.txt");
-
-	vec b;
-	b.load("mats/sor/b-m.txt");
-
-	uword ht = img_z.n_rows;
-	uword wt = img_z.n_cols;
-	uword side_length = (ht * wt * 2);
-
-	mat A(side_length, side_length);
-
-	A.load("mats/sor/A-m.txt");
-
-	mat du, dv;
-	vec duv(ht * wt * 2, fill::zeros);
-
-	duv = successive_overrelaxation(&fail_flag, A, duv, b, omega, inner_iter,
-			tolerance);
-
-	duv.save("mats/sor/duv-c.txt", raw_ascii);
-}
 
 void rb_sor_test() {
 	double omega = 1.8, tolerance = 1e-8;
@@ -157,3 +130,31 @@ void resize_test() {
 	u.save("mats/main/u-c.txt", raw_ascii);
 	v.save("mats/main/v-c.txt", raw_ascii);
 }
+
+//void sor_test() {
+//	double omega = 1.8, tolerance = 1e-8;
+//	int inner_iter = 500;
+//	uword fail_flag = 0;
+//
+//	mat img_z;
+//	img_z.load("mats/derivatives/img_z-m.txt");
+//
+//	vec b;
+//	b.load("mats/sor/b-m.txt");
+//
+//	uword ht = img_z.n_rows;
+//	uword wt = img_z.n_cols;
+//	uword side_length = (ht * wt * 2);
+//
+//	mat A(side_length, side_length);
+//
+//	A.load("mats/sor/A-m.txt");
+//
+//	mat du, dv;
+//	vec duv(ht * wt * 2, fill::zeros);
+//
+//	duv = successive_overrelaxation(A, fail_flag, duv, b, omega, inner_iter,
+//			tolerance);
+//
+//	duv.save("mats/sor/duv-c.txt", raw_ascii);
+//}

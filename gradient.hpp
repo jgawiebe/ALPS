@@ -13,9 +13,9 @@ using namespace arma;
 
 //M: gaussDeriv
 tuple<mat, mat> gradient(mat x_deriv, mat y_deriv, mat I) {
-  //int sigma = 1;
+	//int sigma = 1;
   int limit = 1000;
-  //int variance = 1;
+	//int variance = 1;
   int denominator = 2;
 	double thresh = 1e-6;
 

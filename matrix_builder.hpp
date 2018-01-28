@@ -1,8 +1,8 @@
 /*
-energy_calc.hpp
-Jacob Wiebe & James Dolman
-Rev1: Nov 2017
-*/
+ energy_calc.hpp
+ Jacob Wiebe & James Dolman
+ Rev1: Nov 2017
+ */
 
 #include <iostream>
 #include <armadillo>
@@ -15,80 +15,80 @@ using namespace arma;
 // int height = 0, width = 0;
 
 //M: constructMatrix
-tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
-		mat dxx, mat dxy, mat dyy, mat dxz, mat dyz, mat e_data,
-		mat e_smooth, mat u, mat v, double gamma){
 
+tuple<sp_mat, vec> build_matrix(sp_mat A, vec b, mat img2_dx, mat img2_dy,
+		mat img_z, mat dxx, mat dxy, mat dyy, mat dxz, mat dyz, mat e_data,
+		mat e_smooth, mat u, mat v, double gamma) {
+	cout << "In build_matrix" << endl;
 	uword height = u.n_rows;
 	uword width = u.n_cols;
 
 	uword e_height = e_smooth.n_rows;
 	uword e_width = e_smooth.n_cols;
 //-----------------------------------------------------------------------------------------------
-  //top and bottom row to zero
-  e_smooth.head_rows(1) = zeros<rowvec>(e_width);
-  e_smooth.tail_rows(1) = zeros<rowvec>(e_width);
+//-----------------------------------------------------------------------------------------------
+	//top and bottom row to zero
+	e_smooth.head_rows(1) = zeros<rowvec>(e_width);
+	e_smooth.tail_rows(1) = zeros<rowvec>(e_width);
 
-  //left and right col to zero
-  e_smooth.head_cols(1) = zeros<vec>(e_height);
-  e_smooth.tail_cols(1) = zeros<vec>(e_height);
+	//left and right col to zero
+	e_smooth.head_cols(1) = zeros<vec>(e_height);
+	e_smooth.tail_cols(1) = zeros<vec>(e_height);
 //-------------------------------------------------------------------------------------------------
-
 
 	// M: tmp = repmat( 1 : 2 * ht * wt, 6, 1 ) ;
 	// M: ros = tmp(:);
-	uword temp4repmat = 2*height*width*6;
+	uword temp4repmat = 2 * height * width * 6;
 	int tempPop = 1;
-
 
 	vec rows(temp4repmat); //column vector of size temp4repmat
 
-	for (uword i = 0; i<temp4repmat ; i++){
-		if(i%6 == 0 && i != 0){
+	for (uword i = 0; i < temp4repmat; i++) {
+		if (i % 6 == 0 && i != 0) {
 			tempPop++;
 		}
 		rows(i) = tempPop;
 	}
-   /////////////////Where I started 11 Jan 2018////////////////////
+	/////////////////Where I started 11 Jan 2018////////////////////
 
 	//M:cols = rows
 	vec cols = rows;
 
 	//M:vals = zeros( size( rows ) )
-	vec vals(size(rows), fill::zeros);
+	vec vals(temp4repmat, fill::zeros);
 
 	//MatLab is 1 indexed and C++ is 0 indexed. So thats why i in the
 	//loop is 1 less than in the Matlab comment.
 	//M:cols(1:6:end) = rows(1:6:end) - 2 * ht ;	% x-1
-	for (uword i = 0; i<temp4repmat ; i=i+6){
-			cols(i) = rows(i) - (2*height);
+	for (uword i = 0; i < temp4repmat; i = i + 6) {
+		cols(i) = rows(i) - (2 * height);
 	}
 	//M:cols(2:6:end) = rows(2:6:end) - 2 ;			% y-1
-	for (uword i = 1; i<temp4repmat ; i=i+6){
-			cols(i) = rows(i) - 2;
+	for (uword i = 1; i < temp4repmat; i = i + 6) {
+		cols(i) = rows(i) - 2;
 	}
 
 	//M:cols(9:12:end) = rows(9:12:end) - 1 ;		% v
-	for (uword i = 8; i<temp4repmat ; i=i+12){
-			cols(i) = rows(i) - 1;
+	for (uword i = 8; i < temp4repmat; i = i + 12) {
+		cols(i) = rows(i) - 1;
 	}
 
 	//M:cols(4:12:end) = rows(4:12:end) + 1 ;		% u
-	for (uword i = 3; i<temp4repmat ; i=i+12){
-			cols(i) = rows(i) + 1;
+	for (uword i = 3; i < temp4repmat; i = i + 12) {
+		cols(i) = rows(i) + 1;
 	}
 
 	//M:cols(5:6:end) = rows(5:6:end) + 2 ;			% y+1
-	for (uword i = 4; i<temp4repmat ; i=i+6){
-			cols(i) = rows(i) + 2;
+	for (uword i = 4; i < temp4repmat; i = i + 6) {
+		cols(i) = rows(i) + 2;
 	}
 
 	//M:cols(6:6:end) = rows(6:6:end) + 2 * ht ;	% x+1
-	for (uword i = 5; i<temp4repmat ; i=i+6){
-			cols(i) = rows(i) + (2*height);
+	for (uword i = 5; i < temp4repmat; i = i + 6) {
+		cols(i) = rows(i) + (2 * height);
 	}
 
-        //start for 14 Jan 17
+	//start for 14 Jan 17
 
 	//M:E_sum = (1) aE_smooth( 1 : 2 : 2 * ht, 2 : 2 : end ) + (2)aE_smooth( 3 : 2 : end, 2 : 2 : end ) +...
 	// (3)aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) + (4)aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
@@ -101,48 +101,50 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 
 	//THIS WILL NEED MORE WORK AS E_SUM NEEDS TO BE INDEXED DIFFERENTLY THAN E_SMOOTH>DONE
 
-	mat e_sum(height , width , fill::zeros);
+	mat e_sum(height, width, fill::zeros);
 
 	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS> DONE
 	uword ik = 0;
 	uword jk = 0;
-	for (uword i = 2; i<e_height ; i=i+2){
-		for (uword j = 2; j<e_width ; j=j+2){
-				if (i < (2*height)){//ht good
-					if(j <(2*width)){//ht good //width good
+	for (uword i = 2; i < e_height; i = i + 2) {
+		for (uword j = 2; j < e_width; j = j + 2) {
+			if (i < (2 * height)) {	//ht good
+				if (j < (2 * width)) {	//ht good //width good
 
-						e_sum(ik,jk) += e_smooth(i,j-1); //(2)
-						e_sum(ik,jk) += e_smooth(i-1,j); //(4)
-						e_sum(ik,jk) += e_smooth(i-2,j-1); //(1)
-						e_sum(ik,jk) += e_smooth(i-1,j-2); //(3)
-					}else{ //ht good
-						e_sum(ik,jk) += e_smooth(i,j-1);
-						e_sum(ik,jk) += e_smooth(i-1,j);
-						e_sum(ik,jk) += e_smooth(i-2,j-1); //(2)+(4)+(1), just height good
-					}
-				} else if(j <(2*width)){//width good
-					e_sum(ik,jk) += e_smooth(i,j-1);
-					e_sum(ik,jk) += e_smooth(i-1,j);
-					e_sum(ik,jk) += e_smooth(i-1,j-2); //(2)+(4)+(3), just width good
-				}else{
-					e_sum(ik,jk) += e_smooth(i,j-1);
-					e_sum(ik,jk) += e_smooth(i-1,j); //(2)+(4), neither height or width good
+					e_sum(ik, jk) += e_smooth(i, j - 1); //(2)
+					e_sum(ik, jk) += e_smooth(i - 1, j); //(4)
+					e_sum(ik, jk) += e_smooth(i - 2, j - 1); //(1)
+					e_sum(ik, jk) += e_smooth(i - 1, j - 2); //(3)
+				} else { //ht good
+					e_sum(ik, jk) += e_smooth(i, j - 1);
+					e_sum(ik, jk) += e_smooth(i - 1, j);
+					e_sum(ik, jk) += e_smooth(i - 2, j - 1); //(2)+(4)+(1), just height good
 				}
-				jk++;
-			}//for loop for the columns
+			} else if (j < (2 * width)) { //width good
+				e_sum(ik, jk) += e_smooth(i, j - 1);
+				e_sum(ik, jk) += e_smooth(i - 1, j);
+				e_sum(ik, jk) += e_smooth(i - 1, j - 2); //(2)+(4)+(3), just width good
+			} else {
+				e_sum(ik, jk) += e_smooth(i, j - 1);
+				e_sum(ik, jk) += e_smooth(i - 1, j); //(2)+(4), neither height or width good
+			}
+			jk++;
+		} //for loop for the columns
 		jk = 0;
 		ik++;
-	}//for loop for the rows
-
+	} //for loop for the rows
 
 	//M:uapp = E_Data .* ( Ikx .^ 2 + gamma * ( Ixx .^ 2 + Ixy .^ 2 ) ) + E_sum ;
-	mat uapp = e_data % (square(img2_dx) + gamma * (square(dxx)+square(dxy))) + e_sum;
+	mat uapp = e_data % (square(img2_dx) + gamma * (square(dxx) + square(dxy)))
+			+ e_sum;
 
 	//M:vapp = E_Data .* ( Iky .^ 2 + gamma * ( Iyy .^ 2 + Ixy .^ 2 ) ) + E_sum ;
-	mat vapp = e_data % (square(img2_dy) + gamma * (square(dyy)+square(dxy))) + e_sum;
+	mat vapp = e_data % (square(img2_dy) + gamma * (square(dyy) + square(dxy)))
+			+ e_sum;
 
 	//M:uvapp = E_Data .* ( Ikx .* Iky + gamma * ( Ixx .* Ixy + Iyy .* Ixy ) ) ;
-	mat uvapp = e_data % ((img2_dx % img2_dy) + gamma * ((dxx % dxy) + (dyy % dxy)));
+	mat uvapp = e_data
+			% ((img2_dx % img2_dy) + gamma * ((dxx % dxy) + (dyy % dxy)));
 
 	//M:vuapp = E_Data .* ( Ikx .* Iky + gamma * ( Ixx .* Ixy + Iyy .* Ixy ) ) ;
 	// vuapp declaration is the same as the uvapp, therefore vuapp is a duplicate
@@ -153,27 +155,26 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 	//start 15 Jan 17
 
 	//4 temp matrixes used in initializing vals,
-	mat tmp1(height , width , fill::zeros); //NOTE NO IT WONT IT WILL BE HALF THE SIZE AS YOU TAKE EVERY 2ND
+	mat tmp1(height, width, fill::zeros); //NOTE NO IT WONT IT WILL BE HALF THE SIZE AS YOU TAKE EVERY 2ND
 	mat tmp2 = tmp1;
 	mat tmp3 = tmp1;
 	mat tmp4 = tmp1;
 	ik = 0;
-    jk = 0;
+	jk = 0;
 	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS>Done
 	//INDEXING CORRECT HERE AS TMP JUST TAKES EVERY SECOND ONE OF E_SMOOTH
-	for (uword i = 2; i<e_height ; i=i+2){
-			for (uword j = 2; j<e_width ; j=j+2){
-				 tmp1(ik,jk) = e_smooth(i-1,j-2); //M:tmp = aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) ;
-				 tmp2(ik,jk) = e_smooth(i-1,j);   //M:tmp = aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
-				 tmp3(ik,jk) = e_smooth(i-2,j-1);//M:tmp = aE_smooth( 1 : 2 : 2 * ht, 2 : 2 : end ) ;
-				 tmp4(ik,jk) = e_smooth(i,j-1);       //M:tmp = aE_smooth( 3 : 2 : end, 2 : 2 : end ) ;
+	for (uword i = 2; i < e_height; i = i + 2) {
+		for (uword j = 2; j < e_width; j = j + 2) {
+			tmp1(ik, jk) = e_smooth(i - 1, j - 2); //M:tmp = aE_smooth( 2 : 2 : end, 1 : 2 : 2 * wt ) ;
+			tmp2(ik, jk) = e_smooth(i - 1, j); //M:tmp = aE_smooth( 2 : 2 : end, 3 : 2 : end ) ;
+			tmp3(ik, jk) = e_smooth(i - 2, j - 1); //M:tmp = aE_smooth( 1 : 2 : 2 * ht, 2 : 2 : end ) ;
+			tmp4(ik, jk) = e_smooth(i, j - 1); //M:tmp = aE_smooth( 3 : 2 : end, 2 : 2 : end ) ;
 
-					jk++;
-				}//for loop for the columns
-			jk = 0;
-			ik++;
-		}//for loop for the rows
-
+			jk++;
+		}       //for loop for the columns
+		jk = 0;
+		ik++;
+	}       //for loop for the rows
 
 	//M:vals( 3 : 12 : end ) = uapp(:) ;
 	//M:vals( 10 : 12 : end ) = vapp(:) ;
@@ -195,21 +196,21 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 	vectorise(uvapp);
 	ik = 0;
 
-	for (uword i = 11; i<temp4repmat ; i=i+12){
-		vals(i-9) = uapp(ik);
-		vals(i-2) = vapp(ik);
-		vals(i-8) = uvapp(ik);
-		vals(i-3) = uvapp(ik);
+	for (uword i = 11; i < temp4repmat; i = i + 12) {
+		vals(i - 9) = uapp(ik);
+		vals(i - 2) = vapp(ik);
+		vals(i - 8) = uvapp(ik);
+		vals(i - 3) = uvapp(ik);
 
-		vals(i-11)= -(tmp1(ik));
-		vals(i-5) = -(tmp1(ik));
-		vals(i-6) = -(tmp2(ik));
-		vals(i)   = -(tmp2(ik));
+		vals(i - 11) = -(tmp1(ik));
+		vals(i - 5) = -(tmp1(ik));
+		vals(i - 6) = -(tmp2(ik));
+		vals(i) = -(tmp2(ik));
 
-		vals(i-10)= -(tmp3(ik));
-		vals(i-4) = -(tmp3(ik));
-		vals(i-7) = -(tmp4(ik));
-		vals(i-1) = -(tmp4(ik));
+		vals(i - 10) = -(tmp3(ik));
+		vals(i - 4) = -(tmp3(ik));
+		vals(i - 7) = -(tmp4(ik));
+		vals(i - 1) = -(tmp4(ik));
 
 		ik++;
 	}
@@ -221,99 +222,103 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 	mat upad(height + 2, width + 2, fill::zeros);
 	mat vpad(v.n_rows + 2, v.n_cols + 2, fill::zeros);
 //--------------------------------------------------------------------------------------
-	upad.submat(1,1,height,width)=u;
-	vpad.submat(1,1,v.n_rows,v.n_cols)=v;
+	upad.submat(1, 1, height, width) = u;
+	vpad.submat(1, 1, v.n_rows, v.n_cols) = v;
 //---------------------------------------------------------------------------------------
 	/*% Computing the constant terms for the first of the Euler Lagrange equations
-	pdfaltsumu = aE_smooth(2:2:end, 1:2:2*wt) .* ( upad(2:ht+1, 1:wt) -  upad(2:ht+1, 2:wt+1) ) + (1)
-				aE_smooth( 2:2:end, 3:2:end) .*  ( upad(2:ht+1, 3:end) - upad(2:ht+1, 2:wt+1) ) + (2)
-				aE_smooth( 1:2:2*ht, 2:2:end) .* ( upad(1:ht, 2:wt+1) -  upad(2:ht+1, 2:wt+1) ) + (3)
-				aE_smooth( 3:2:end, 2:2:end) .*  ( upad(3:end, 2:wt+1) - upad(2:ht+1, 2:wt+1) ) ; (4) */
+	 pdfaltsumu = aE_smooth(2:2:end, 1:2:2*wt) .* ( upad(2:ht+1, 1:wt) -  upad(2:ht+1, 2:wt+1) ) + (1)
+	 aE_smooth( 2:2:end, 3:2:end) .*  ( upad(2:ht+1, 3:end) - upad(2:ht+1, 2:wt+1) ) + (2)
+	 aE_smooth( 1:2:2*ht, 2:2:end) .* ( upad(1:ht, 2:wt+1) -  upad(2:ht+1, 2:wt+1) ) + (3)
+	 aE_smooth( 3:2:end, 2:2:end) .*  ( upad(3:end, 2:wt+1) - upad(2:ht+1, 2:wt+1) ) ; (4) */
 
-	mat pdfaltsumu( height , width , fill::zeros);
-	mat pdfaltsumv  = pdfaltsumu;
+	mat pdfaltsumu(height, width, fill::zeros);
+	mat pdfaltsumv = pdfaltsumu;
 
-	uvec rowstk1(e_height/2,fill::zeros) ;
-	uvec colstk1(e_width/2,fill::zeros) ;
-	uvec rowstk2(e_height/2,fill::zeros) ;
-	uvec colstk2(e_width/2,fill::zeros) ;
-	uvec rowstk3(e_height/2,fill::zeros) ;
-	uvec colstk3(e_width/2,fill::zeros) ;
-	uvec rowstk4(e_height/2,fill::zeros) ;
-	uvec colstk4(e_width/2,fill::zeros) ;
+	uvec rowstk1(e_height / 2, fill::zeros);
+	uvec colstk1(e_width / 2, fill::zeros);
+	uvec rowstk2(e_height / 2, fill::zeros);
+	uvec colstk2(e_width / 2, fill::zeros);
+	uvec rowstk3(e_height / 2, fill::zeros);
+	uvec colstk3(e_width / 2, fill::zeros);
+	uvec rowstk4(e_height / 2, fill::zeros);
+	uvec colstk4(e_width / 2, fill::zeros);
 
-	tmp1.resize(upad.n_rows,upad.n_cols);//tmp size upad
-	tmp2 =tmp1;
-	tmp3 =tmp1;
-	tmp4 =tmp1;
-mat tmp5 =tmp1;
+	tmp1.resize(upad.n_rows, upad.n_cols);	//tmp size upad
+	tmp2 = tmp1;
+	tmp3 = tmp1;
+	tmp4 = tmp1;
+	mat tmp5 = tmp1;
 
-	tmp1 = upad.submat(1,1,height,width) ; //(0)
-	tmp2 = upad.submat(1,0,height,width-1);// (1)
-	tmp3 = upad.submat(1,2,height,(upad.n_cols)-1);// (2)
-	tmp4 = upad.submat(0,1,height-1,width);// (3)
-	tmp5 = upad.submat(2,1,(upad.n_rows)-1,width);//(4)
+	tmp1 = upad.submat(1, 1, height, width); //(0)
+	tmp2 = upad.submat(1, 0, height, width - 1); // (1)
+	tmp3 = upad.submat(1, 2, height, (upad.n_cols) - 1); // (2)
+	tmp4 = upad.submat(0, 1, height - 1, width); // (3)
+	tmp5 = upad.submat(2, 1, (upad.n_rows) - 1, width); //(4)
 
 	//----------------------------CURRENTLY WORKING IN THIS LOOP, TRYING TO BUILD THE INDEX VECTORS FOR THE TWO LOOPS BELOW
 
 	ik = 0;
-	for (uword i = 2; i<e_height ; i=i+2){
-		rowstk1(ik) = i-1;
-		rowstk2(ik) = i-1;
-		rowstk3(ik) = i-2;
+	for (uword i = 2; i < e_height; i = i + 2) {
+		rowstk1(ik) = i - 1;
+		rowstk2(ik) = i - 1;
+		rowstk3(ik) = i - 2;
 		rowstk4(ik) = i;
 		ik++;
-	}//for loop for the rows
+	} //for loop for the rows
 
 	jk = 0;
-	for (uword j = 2; j<e_width ; j=j+2){
-		colstk1(jk) = j-2;
+	for (uword j = 2; j < e_width; j = j + 2) {
+		colstk1(jk) = j - 2;
 		colstk2(jk) = j;
-		colstk3(jk) = j-1;
-		colstk4(jk) = j-1;
+		colstk3(jk) = j - 1;
+		colstk4(jk) = j - 1;
 		jk++;
-	}//for loop for the columns
+	} //for loop for the columns
 
-	pdfaltsumu += e_smooth.submat(rowstk1,colstk1)%(tmp2 - tmp1);
-	pdfaltsumu += e_smooth.submat(rowstk2,colstk2)%(tmp3 - tmp1);
-	pdfaltsumu += e_smooth.submat(rowstk3,colstk3)%(tmp4 - tmp1);
-	pdfaltsumu += e_smooth.submat(rowstk4,colstk4)%(tmp5 - tmp1);
+	pdfaltsumu += e_smooth.submat(rowstk1, colstk1) % (tmp2 - tmp1);
+	pdfaltsumu += e_smooth.submat(rowstk2, colstk2) % (tmp3 - tmp1);
+	pdfaltsumu += e_smooth.submat(rowstk3, colstk3) % (tmp4 - tmp1);
+	pdfaltsumu += e_smooth.submat(rowstk4, colstk4) % (tmp5 - tmp1);
 
-/*	% Computing the constant terms for the second of the Euler Lagrange equations
-	pdfaltsumv = aE_smooth(2:2:end, 1:2:2*wt) .* ( vpad(2:ht+1, 1:wt) - vpad(2:ht+1, 2:wt+1) ) + ...
-				aE_smooth( 2:2:end, 3:2:end) .* ( vpad(2:ht+1, 3:end) - vpad(2:ht+1, 2:wt+1) ) + ...
-				aE_smooth( 1:2:2*ht, 2:2:end) .* ( vpad(1:ht, 2:wt+1) - vpad(2:ht+1, 2:wt+1) ) + ...
-				aE_smooth( 3:2:end, 2:2:end) .* ( vpad(3:end, 2:wt+1) - vpad(2:ht+1, 2:wt+1) ) ;
-*/
-	tmp1 = vpad.submat(1,1,height,width) ; //(0)
-	tmp2 = vpad.submat(1,0,height,width-1);// (1)
-	tmp3 = vpad.submat(1,2,height,(upad.n_cols)-1);// (2)
-	tmp4 = vpad.submat(0,1,height-1,width);// (3)
-	tmp5 = vpad.submat(2,1,(upad.n_rows)-1,width);//(4)
-    //use same row and col vectors as they are the same as pdfaltsumu
-	pdfaltsumv += e_smooth.submat(rowstk1,colstk1)%(tmp2 - tmp1);
-	pdfaltsumv += e_smooth.submat(rowstk2,colstk2)%(tmp3 - tmp1);
-	pdfaltsumv += e_smooth.submat(rowstk3,colstk3)%(tmp4 - tmp1);
-	pdfaltsumv += e_smooth.submat(rowstk4,colstk4)%(tmp5 - tmp1);
+	/*	% Computing the constant terms for the second of the Euler Lagrange equations
+	 pdfaltsumv = aE_smooth(2:2:end, 1:2:2*wt) .* ( vpad(2:ht+1, 1:wt) - vpad(2:ht+1, 2:wt+1) ) + ...
+	 aE_smooth( 2:2:end, 3:2:end) .* ( vpad(2:ht+1, 3:end) - vpad(2:ht+1, 2:wt+1) ) + ...
+	 aE_smooth( 1:2:2*ht, 2:2:end) .* ( vpad(1:ht, 2:wt+1) - vpad(2:ht+1, 2:wt+1) ) + ...
+	 aE_smooth( 3:2:end, 2:2:end) .* ( vpad(3:end, 2:wt+1) - vpad(2:ht+1, 2:wt+1) ) ;
+	 */
+	tmp1 = vpad.submat(1, 1, height, width); //(0)
+	tmp2 = vpad.submat(1, 0, height, width - 1); // (1)
+	tmp3 = vpad.submat(1, 2, height, (upad.n_cols) - 1); // (2)
+	tmp4 = vpad.submat(0, 1, height - 1, width); // (3)
+	tmp5 = vpad.submat(2, 1, (upad.n_rows) - 1, width); //(4)
+	//use same row and col vectors as they are the same as pdfaltsumu
+	pdfaltsumv += e_smooth.submat(rowstk1, colstk1) % (tmp2 - tmp1);
+	pdfaltsumv += e_smooth.submat(rowstk2, colstk2) % (tmp3 - tmp1);
+	pdfaltsumv += e_smooth.submat(rowstk3, colstk3) % (tmp4 - tmp1);
+	pdfaltsumv += e_smooth.submat(rowstk4, colstk4) % (tmp5 - tmp1);
 
 	//M:constu = E_Data .* ( Ikx .* Ikz + gamma * ( Ixx .* Ixz + Ixy .* Iyz ) ) - pdfaltsumu ;
 	//M:constv = E_Data .* ( Iky .* Ikz + gamma * ( Ixy .* Ixz + Iyy .* Iyz ) ) - pdfaltsumv ;
-	mat constu = e_data % ((img2_dx %  img_z) + gamma * ((dxx % dxz) + (dxy % dyz))) - pdfaltsumu;
-	mat constv = e_data % ((img2_dy %  img_z) + gamma * ((dxy % dxz) + (dyy % dyz))) - pdfaltsumv;
+	mat constu = e_data
+			% ((img2_dx % img_z) + gamma * ((dxx % dxz) + (dxy % dyz)))
+			- pdfaltsumu;
+	mat constv = e_data
+			% ((img2_dy % img_z) + gamma * ((dxy % dxz) + (dyy % dyz)))
+			- pdfaltsumv;
 
 	//M:b = zeros( 2 * ht * wt, 1 ) ;
 	//M:b(1:2:end) = -constu(:) ;
 	//M:b(2:2:end) = -constv(:) ;
 
-	b.zeros((2*height*width));
+	b.zeros((2 * height * width));
 	vectorise(constu);
 	vectorise(constv);
 
 	ik = 0;
 
-	for (uword i = 1; i<b.n_rows ; i=i+2){
+	for (uword i = 1; i < b.n_rows; i = i + 2) {
 		b(i) = -(constv(ik));
-		b(i-1) = -(constu(ik));
+		b(i - 1) = -(constu(ik));
 		ik++;
 	}
 
@@ -322,73 +327,123 @@ mat tmp5 =tmp1;
 	//M:cols = cols( ind ) ;
 	//M:vals = vals( ind ) ;
 
+	for (uword i = 0; i < cols.n_rows; i = i + 1) {
+		if (cols(i) > 0) {
 
-	for (uword i = 0; i<cols.n_rows ; i=i+1){
-			if(cols(i) > 0){
-
-			}else{
-				cols.shed_row(i);
-				rows.shed_row(i);
-				vals.shed_row(i);
-			}
+		} else {
+			cols.shed_row(i);
+			rows.shed_row(i);
+			vals.shed_row(i);
+		}
 	}
-	for (uword i = 0; i<cols.n_rows ; i=i+1){
-			if(cols(i) > 0){
+	for (uword i = 0; i < cols.n_rows; i = i + 1) {
+		if (cols(i) > 0) {
 
-			}else{
-				cols.shed_row(i);
-				rows.shed_row(i);
-				vals.shed_row(i);
-			}
+		} else {
+			cols.shed_row(i);
+			rows.shed_row(i);
+			vals.shed_row(i);
+		}
 	}
 
 	//M:ind = find(cols < ( 2 * ht * wt + 1 ) ) ;
 	//M:rows = rows( ind ) ;
 	//M:cols = cols( ind ) ;
 	//M:vals = vals( ind ) ;
-	for (uword i = 0; i<cols.n_rows ; i=i+1){
-			if(cols(i) < (2*height*width+1)){
+	for (uword i = 0; i < cols.n_rows; i = i + 1) {
+		if (cols(i) < (2 * height * width + 1)) {
 
-			}else{
-				cols.shed_row(i);
-				rows.shed_row(i);
-				vals.shed_row(i);
-			}
+		} else {
+			cols.shed_row(i);
+			rows.shed_row(i);
+			vals.shed_row(i);
+		}
 	}
-	for (uword i = 0; i<cols.n_rows ; i=i+1){
-			if(cols(i) < (2*height*width+1)){
+	for (uword i = 0; i < cols.n_rows; i = i + 1) {
+		if (cols(i) < (2 * height * width + 1)) {
 
-			}else{
-				cols.shed_row(i);
-				rows.shed_row(i);
-				vals.shed_row(i);
+		} else {
+			cols.shed_row(i);
+			rows.shed_row(i);
+			for (uword i = 0; i < cols.n_cols; i = i + 1) {
+				if (cols(i) < (2 * height * width + 1)) {
+
+				} else {
+					cols.shed_col(i);
+					rows.shed_col(i);
+					vals.shed_row(i);
+				}
 			}
-	}
+			for (uword i = 0; i < cols.n_cols; i = i + 1) {
+				if (cols(i) < (2 * height * width + 1)) {
 
-/*	if(cols(0) > 0 || cols(5) > 0){
-		cout<<"false positive cols(0)"<<cols(0)<<endl;
-		cout<<"false positive cols(5)"<<cols(5)<<endl;
-	}else{
-		cout<<"pass"<<endl;
-		cout<<" positive cols(0)"<<cols(0)<<endl;
-		cout<<" positive cols(5)"<<cols(5)<<endl;
-	}*/
+				} else {
+					cols.shed_col(i);
+					rows.shed_col(i);
+					vals.shed_row(i);
+				}
+			}
 
+			/*	if(cols(0) > 0 || cols(5) > 0){
+			 cout<<"false positive cols(0)"<<cols(0)<<endl;
+			 cout<<"false positive cols(5)"<<cols(5)<<endl;
+			 }else{
+			 cout<<"pass"<<endl;
+			 cout<<" positive cols(0)"<<cols(0)<<endl;
+			 cout<<" positive cols(5)"<<cols(5)<<endl;
+			 }*/
 
-	//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
-	//M:A = sparse (rows,cols,vals) ;
-	//not sure if the below code will work
-	mat temp(cols.n_rows,3);
-	temp.insert_cols(0, rows);
-	temp.insert_cols(1, cols);
-	temp.insert_cols(2, vals);
+			//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
+			for (uword i = 0; i < cols.n_cols; i = i + 1) {
 
-	//rows.save("mats/test_matrix_builder/Outputs/rows-c", raw_ascii);
-	//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
-	//vals.save("mats/test_matrix_builder/Outputs/vals-c", raw_ascii);
-	//---------------------------------------------------------------------------
- 	A=temp;
+				cols(i) = cols(i) - 1;
+				rows(i) = rows(i) - 1;
+
+			}
+
+			/*	if(cols(0) > 0 || cols(5) > 0){
+			 cout<<"false positive cols(0)"<<cols(0)<<endl;
+			 cout<<"false positive cols(5)"<<cols(5)<<endl;
+			 }else{
+			 cout<<"pass"<<endl;
+			 cout<<" positive cols(0)"<<cols(0)<<endl;
+			 cout<<" positive cols(5)"<<cols(5)<<endl;
+			 }*/
+
+			//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
+			//M:A = sparse (rows,cols,vals) ;
+			//not sure if the below code will work
+			mat temp(cols.n_rows, 3);
+			temp.insert_cols(0, rows);
+			temp.insert_cols(1, cols);
+			temp.insert_cols(2, vals);
+			//mat temp(cols.n_rows,3);
+			//temp.insert_cols(0, rows);
+			//temp.insert_cols(1, cols);
+			//temp.insert_cols(2, vals);
+
+			//rows.save("mats/test_matrix_builder/OutputsV2/rowsv5-c", raw_ascii);
+//	cols.save("mats/test_matrix_builder/OutputsV2/colsv5-c", raw_ascii);
+			//vals.save("mats/test_matrix_builder/OutputsV2/valsv2-c", raw_ascii);
+			//---------------Create Square Matrix-------------------------------------------
+
+			//do that here
+			umat locations = join_cols(rows, cols);
+
+			sp_mat C1(locations, vals);
+
+			A = C1;
+
+			//rows.save("mats/test_matrix_builder/Outputs/rows-c", raw_ascii);
+			//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
+			//vals.save("mats/test_matrix_builder/Outputs/vals-c", raw_ascii);
+			//---------------------------------------------------------------------------
+			A = temp;
 //----------------------------------------------------------------------------------
-	//end Jan 17 - just need to do pdfaltsumv's > Done morning of 19th.
-	return make_tuple(A,b);
+			//cout<<A <<endl; //can be used to prove A is working correctly.
+			//end Jan 17 - just need to do pdfaltsumv's > Done morning of 19th.
+
+		}
+	}
+	return make_tuple(A, b);
 }
