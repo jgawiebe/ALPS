@@ -1,0 +1,104 @@
+/*
+ energy_calc.hpp
+ Jacob Wiebe & James Dolman
+ Rev1: Nov 2017
+ Rev2: Jan 2018
+ */
+
+#include <iostream>
+#include <armadillo>
+
+using namespace std;
+using namespace arma;
+
+//M: sor
+//the solution 'x' is the vector 'duv'
+//failure flag can also be used outside this function
+tuple<vec, bool> successive_overrelaxation(bool failure, mat A, vec x, vec b,
+		double omega,
+		int inner_iter, double tolerance) {
+
+	double error;
+    failure = true;
+
+	mat M(A.n_rows + 2, A.n_cols + 2, fill::zeros);
+    //double approx = 0.0;
+	M = (A * x) + b;
+
+	// for (uword i=0; i<M.n_elem; i++) {
+	// 	for (uword j=0; j<M.n_elem; j++) {
+	// 		if (i==0) {
+	// 			M.at(i, j) = 1.0;
+	// 		} else {
+	// 			M.at(i, j) = approx;
+	// 		}
+	// 	}
+	// }
+
+
+
+//RED LOOP
+	double sum = 0.0;
+
+	for (int iter = 0; iter <= inner_iter; iter++) {
+		error = 0.0;
+
+		//RED odd cells
+		for (uword i=1; i < M.n_rows + 1; i += 2) { //start at first odd row, step by 2
+			for (uword j=1; j < M.n_cols + 1; j += 2) { //start at first odd col, step by 2
+				
+				sum = (M.at(i, j+1) + M.at(i + 1, j) + M.at(i-1, j) + M.at(i, j-1)) / 4;
+				
+				error = max(abs(omega *( sum - M.at(i, j))), error);
+
+				M.at(i, j) = ((omega - 1) * M.at(i, j)) + (omega * sum);
+			}
+		}
+
+        //RED even cells
+		for (uword i=1; i < M.n_rows + 1; i += 2) { //start at first even row, step by 2
+			for (uword j=1; j < M.n_cols + 1; j += 2) { //start at first even col, step by 2
+				
+				sum = (M.at(i, j+1) + M.at(i + 1, j) + M.at(i-1, j) + M.at(i, j-1)) / 4;
+				
+				error = max(abs(omega * (sum - M.at(i, j))), error);
+
+				M.at(i, j) = ((omega - 1) * M.at(i, j)) + (omega * sum);
+			}
+		}
+
+    //BLACK LOOP
+
+		//BLACK odd cells
+		for (uword i=1; i < M.n_rows + 1; i += 2) { //start at first odd row, step by 2
+			for (uword j=2; j < M.n_cols + 1; j += 2) { //start at second even col, step by 2
+				
+				sum = (M.at(i, j+1) + M.at(i + 1, j) + M.at(i-1, j) + M.at(i, j-1)) / 4;
+				
+				error = max(abs(omega *( sum - M.at(i, j))), error);
+
+				M.at(i, j) = ((omega - 1) * M.at(i, j)) + (omega * sum);
+			}
+		}
+
+        //BLACK even cells
+		for (uword i=1; i < M.n_rows + 1; i += 2) { //start at first even row, step by 2
+			for (uword j=1; j < M.n_cols + 1; j += 2) { //start at first even col, step by 2
+				
+				sum = (M.at(i, j+1) + M.at(i + 1, j) + M.at(i-1, j) + M.at(i, j-1)) / 4;
+				
+				error = max(abs(omega * (sum - M.at(i, j))), error);
+
+				M.at(i, j) = ((omega - 1) * M.at(i, j)) + (omega * sum);
+			}
+		}
+
+        if (error < tolerance) {
+            failure = false;
+            break; //convergence reached
+        }
+    }
+    return make_tuple(x, failure);
+}
+
+
