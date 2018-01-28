@@ -7,6 +7,7 @@
 #include "gradient.hpp"
 #include "successive_overrelaxation.hpp"
 #include "energy_calc.hpp"
+#include "red-black-SOR.hpp"
 
 using namespace std;
 using namespace arma;
@@ -14,18 +15,21 @@ using namespace arma;
 void gauss_test();
 void gradient_test();
 void sor_test();
+void rb_sor_test();
 void psi_test();
 void energy_test();
 void resize_test();
 
 int main() {
 
-	gauss_test();
+	//gauss_test();
 	//derivative_test();
 	//sor_test();
 	//psi_test();
 	//energy_test();
 	//resize_test();
+
+	rb_sor_test();
 
 	return 0;
 }
@@ -86,6 +90,36 @@ void sor_test() {
 
 	duv = successive_overrelaxation(&fail_flag, A, duv, b, omega, inner_iter,
 			tolerance);
+
+	duv.save("mats/sor/duv-c.txt", raw_ascii);
+}
+
+void rb_sor_test() {
+	double omega = 1.8, tolerance = 1e-8;
+	int inner_iter = 500;
+	bool fail_flag = true;
+
+	mat img_z;
+	img_z.load("mats/derivatives/img_z-m.txt");
+
+	vec b;
+	b.load("mats/sor/b-m.txt");
+
+	uword ht = img_z.n_rows;
+	uword wt = img_z.n_cols;
+	uword side_length = (ht * wt * 2);
+
+	mat A(side_length, side_length, fill::zeros);
+
+	//A.load("mats/sor/du-m.txt");
+
+	mat du, dv;
+	vec duv(ht * wt * 2, fill::zeros);
+
+	tie(duv, fail_flag) = redblack_sor(fail_flag, A, duv, b, omega,
+			inner_iter, tolerance);
+
+	cout << "status: " << fail_flag;
 
 	duv.save("mats/sor/duv-c.txt", raw_ascii);
 }
