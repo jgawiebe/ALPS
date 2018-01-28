@@ -15,8 +15,9 @@
 using namespace std;
 using namespace arma;
 void init_variables();
+
 	//variables for matrix_builder
-    mat A;//inspect matlab code, see if these are edited
+    sp_mat A;//inspect matlab code, see if these are edited
 	vec b;
 	mat img2_dx;
 	mat img2_dy;
@@ -37,28 +38,32 @@ void init_variables();
 	double max_it;
 	double tol;
 	vec duv;
-	uword* failure;
+	uword failure;
+
 
 int main() {
+	//testing on matrix builder with new matlab done again, all good!
+
+
+	//Creat new input vectors for test_SOR Then carry on
 
 	init_variables();
 
 	tie(A,b) = build_matrix( A, b,img2_dx,img2_dy,img_z,dxx, dxy, dyy, dxz, dyz, e_data,e_smooth, u, v, gam);
-
+	 cout<<"Out of build_matrix in test main()"<<endl;
 	//build_matrix produces good info for A and b
-	//last 3 columns of A are 0s and will be trimmed here.
-	A.shed_col(3);
-	A.shed_col(3);
-	A.shed_col(3);
-	//0's columns on A trimmed, ready for input to SOR
 
-	duv = successive_overrelaxation(failure,A,b,omega, max_it,tol );
+	//0's columns on A trimmed, ready for input to SOR
+	//note A is a dense matrix at this point of 3 columns which needs to be converted into a
+	//square sparse matrix.
+
+    tie(duv, failure) = successive_overrelaxation(duv, failure, A,b,omega, max_it,tol );
+    cout<<"Out of successive_overrelaxation in test main()"<<endl;
 
 	duv.save("mats/test_SOR/Outputs/duv-c", raw_ascii);
+	//b.save("mats/test_matrix_builder/OutputsV2/bv2-c", raw_ascii);
+	//A.save("mats/test_matrix_builder/OutputsV2/Av2-c", raw_ascii);
 
-	//smallA = A.submat(0,0,99,99);
-	//smallA.save("mats/test_matrix_builder/Outputs/smallA-c", raw_ascii);
-	//create print of what A's dimensions are
 	return 0;
 }
 
@@ -85,26 +90,25 @@ int main() {
 
 void init_variables(){
 	//variables loaded in for matrix_builder
-	img2_dx.load("mats/test_matrix_builder/Inputs/Ikx.txt");
-	img2_dy.load("mats/test_matrix_builder/Inputs/Iky.txt");
-	img_z.load("mats/test_matrix_builder/Inputs/Ikz.txt");
-	dxx.load("mats/test_matrix_builder/Inputs/Ixx.txt");
-	dxy.load("mats/test_matrix_builder/Inputs/Ixy.txt");
-	dyy.load("mats/test_matrix_builder/Inputs/Iyy.txt");
-	dxz.load("mats/test_matrix_builder/Inputs/Ixz.txt");
-    dyz.load("mats/test_matrix_builder/Inputs/Iyz.txt");
-	e_data.load("mats/test_matrix_builder/Inputs/E_Data.txt");
-	e_smooth.load("mats/test_matrix_builder/Inputs/aE_smooth.txt");
-	u.load("mats/test_matrix_builder/Inputs/u.txt");
-	v.load("mats/test_matrix_builder/Inputs/v.txt");
+	img2_dx.load("mats/test_matrix_builder/Inputsv2/IkxV2.txt");
+	img2_dy.load("mats/test_matrix_builder/Inputsv2/IkyV2.txt");
+	img_z.load("mats/test_matrix_builder/Inputsv2/IkzV2.txt");
+	dxx.load("mats/test_matrix_builder/Inputsv2/IxxV2.txt");
+	dxy.load("mats/test_matrix_builder/Inputsv2/IxyV2.txt");
+	dyy.load("mats/test_matrix_builder/Inputsv2/IyyV2.txt");
+	dxz.load("mats/test_matrix_builder/Inputsv2/IxzV2.txt");
+    dyz.load("mats/test_matrix_builder/Inputsv2/IyzV2.txt");
+	e_data.load("mats/test_matrix_builder/Inputsv2/E_DataV2.txt");
+	e_smooth.load("mats/test_matrix_builder/Inputsv2/aE_smoothV2.txt");
+	u.load("mats/test_matrix_builder/Inputsv2/uV2.txt");
+	v.load("mats/test_matrix_builder/Inputsv2/vV2.txt");
     gam = 80; //value stored in gamma.txt
 
     //variables loaded in for successive_overrelaxation.
-    omega = 80;
+    omega = 1.8;
     max_it = 500;
-	duv.load("mats/test_SOR/Inputs/duv.txt");
 	tol = 1*(10^(-8));
-	*failure = 1;
+	failure = 0;
 
 }
 

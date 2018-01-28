@@ -15,10 +15,10 @@ using namespace arma;
 // int height = 0, width = 0;
 
 //M: constructMatrix
-tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
+tuple<sp_mat,vec> build_matrix (sp_mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 		mat dxx, mat dxy, mat dyy, mat dxz, mat dyz, mat e_data,
 		mat e_smooth, mat u, mat v, double gamma){
-
+	cout<<"In build_matrix"<<endl;
 	uword height = u.n_rows;
 	uword width = u.n_cols;
 
@@ -41,7 +41,7 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
 	int tempPop = 1;
 
 
-	vec rows(temp4repmat); //column vector of size temp4repmat
+	urowvec rows(temp4repmat); //column vector of size temp4repmat
 
 	for (uword i = 0; i<temp4repmat ; i++){
 		if(i%6 == 0 && i != 0){
@@ -52,10 +52,10 @@ tuple<mat,vec> build_matrix (mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
    /////////////////Where I started 11 Jan 2018////////////////////
 
 	//M:cols = rows
-	vec cols = rows;
+	urowvec cols = rows;
 
 	//M:vals = zeros( size( rows ) )
-	vec vals(size(rows), fill::zeros);
+	vec vals(temp4repmat, fill::zeros);
 
 	//MatLab is 1 indexed and C++ is 0 indexed. So thats why i in the
 	//loop is 1 less than in the Matlab comment.
@@ -323,21 +323,21 @@ mat tmp5 =tmp1;
 	//M:vals = vals( ind ) ;
 
 
-	for (uword i = 0; i<cols.n_rows ; i=i+1){
+	for (uword i = 0; i<cols.n_cols ; i=i+1){
 			if(cols(i) > 0){
 
 			}else{
-				cols.shed_row(i);
-				rows.shed_row(i);
+				cols.shed_col(i);
+				rows.shed_col(i);
 				vals.shed_row(i);
 			}
 	}
-	for (uword i = 0; i<cols.n_rows ; i=i+1){
+	for (uword i = 0; i<cols.n_cols ; i=i+1){
 			if(cols(i) > 0){
 
 			}else{
-				cols.shed_row(i);
-				rows.shed_row(i);
+				cols.shed_col(i);
+				rows.shed_col(i);
 				vals.shed_row(i);
 			}
 	}
@@ -346,23 +346,31 @@ mat tmp5 =tmp1;
 	//M:rows = rows( ind ) ;
 	//M:cols = cols( ind ) ;
 	//M:vals = vals( ind ) ;
-	for (uword i = 0; i<cols.n_rows ; i=i+1){
+	for (uword i = 0; i<cols.n_cols ; i=i+1){
 			if(cols(i) < (2*height*width+1)){
 
 			}else{
-				cols.shed_row(i);
-				rows.shed_row(i);
+				cols.shed_col(i);
+				rows.shed_col(i);
 				vals.shed_row(i);
 			}
 	}
-	for (uword i = 0; i<cols.n_rows ; i=i+1){
+	for (uword i = 0; i<cols.n_cols ; i=i+1){
 			if(cols(i) < (2*height*width+1)){
 
 			}else{
-				cols.shed_row(i);
-				rows.shed_row(i);
+				cols.shed_col(i);
+				rows.shed_col(i);
 				vals.shed_row(i);
 			}
+	}
+
+	for (uword i = 0; i<cols.n_cols ; i=i+1){
+
+		cols(i) = cols(i) -1;
+		rows(i) = rows(i) -1;
+
+
 	}
 
 /*	if(cols(0) > 0 || cols(5) > 0){
@@ -378,17 +386,25 @@ mat tmp5 =tmp1;
 	//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
 	//M:A = sparse (rows,cols,vals) ;
 	//not sure if the below code will work
-	mat temp(cols.n_rows,3);
-	temp.insert_cols(0, rows);
-	temp.insert_cols(1, cols);
-	temp.insert_cols(2, vals);
+	//mat temp(cols.n_rows,3);
+	//temp.insert_cols(0, rows);
+	//temp.insert_cols(1, cols);
+	//temp.insert_cols(2, vals);
 
-	//rows.save("mats/test_matrix_builder/Outputs/rows-c", raw_ascii);
-	//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
-	//vals.save("mats/test_matrix_builder/Outputs/vals-c", raw_ascii);
-	//---------------------------------------------------------------------------
- 	A=temp;
-//----------------------------------------------------------------------------------
+	//rows.save("mats/test_matrix_builder/OutputsV2/rowsv5-c", raw_ascii);
+//	cols.save("mats/test_matrix_builder/OutputsV2/colsv5-c", raw_ascii);
+	//vals.save("mats/test_matrix_builder/OutputsV2/valsv2-c", raw_ascii);
+	//---------------Create Square Matrix-------------------------------------------
+
+
+	//do that here
+    umat locations = join_cols(rows,cols);
+
+    sp_mat C1(locations,vals);
+
+    A = C1;
+
+	//cout<<A <<endl; //can be used to prove A is working correctly.
 	//end Jan 17 - just need to do pdfaltsumv's > Done morning of 19th.
 	return make_tuple(A,b);
 }
