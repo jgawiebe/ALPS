@@ -20,7 +20,7 @@ mat psi_function(mat x) {
 	return x;
 }
 
-//M: computePsidashFS_brox
+//M: computee_smooth_brox
 mat generate_esmooth(mat u, mat v) {
 	double height = u.n_rows;
 	double width = u.n_cols;
@@ -48,10 +48,9 @@ mat generate_esmooth(mat u, mat v) {
 	mat u_dx2 = conv2(u_dx, temp / 2, "same"); //all "valid"
 	mat v_dx2 = conv2(v_dx, temp / 2, "same");
 
-	mat u_dy2 = conv2(u_dy, tr_temp / 2, "same"); //problem here dy adds col
+	mat u_dy2 = conv2(u_dy, tr_temp / 2, "same");
 	mat v_dy2 = conv2(v_dy, tr_temp / 2, "same");
 
-	//Must perform 2D conv2 but matrix size doesn't line up
 	mat delta_ux = conv2(u_dy2, (temp / 2));      //t
 	delta_ux.shed_row(u_dy2.n_rows - 1);
 	mat u_pdx = pow(u_dx.submat(0, 0, u_dx.n_rows - 1, delta_ux.n_cols - 1), 2)
@@ -96,29 +95,29 @@ mat generate_esmooth(mat u, mat v) {
 //		}
 //	}
 
-	for (uword row = 0; row < e_smooth.n_rows; row++) {
-		for (uword col = 0; col < e_smooth.n_cols; col++) {
-			if ((col % 2) && !(row % 2)) { //odd col, even row
-				e_smooth.at(row, col) = temp_y.at(x, y);
-			} else if (!(col % 2) && (row % 2)) { //even col, odd row
-//				e_smooth.at(row, col) = temp_x.at(x, y);
-			} else {
-				continue; //don't increment x, y if nothing is written
-			}
-			// simple step through matrix
-			if (x == temp_x.n_cols - 1) {
-				x = 0;
-				y++;
-//			} else if (y == temp_y.n_rows - 1) {
-//				return e_smooth;
-			} else {
-				x++;
-			}
-//			if (col == 40) {
-//				e_smooth.save("mats/energy/e_smooth-c.txt", raw_ascii);
+//	for (uword row = 0; row < e_smooth.n_rows; row++) {
+//		for (uword col = 0; col < e_smooth.n_cols; col++) {
+//			if ((col % 2) && !(row % 2)) { //odd col, even row
+//				e_smooth.at(row, col) = temp_y.at(x, y);
+//			} else if (!(col % 2) && (row % 2)) { //even col, odd row
+////				e_smooth.at(row, col) = temp_x.at(x, y);
+//			} else {
+//				continue; //don't increment x, y if nothing is written
 //			}
-		}
-
-	}
+//			// simple step through matrix
+//			if (x == temp_x.n_cols - 1) {
+//				x = 0;
+//				y++;
+////			} else if (y == temp_y.n_rows - 1) {
+////				return e_smooth;
+//			} else {
+//				x++;
+//			}
+////			if (col == 40) {
+////				e_smooth.save("mats/energy/e_smooth-c.txt", raw_ascii);
+////			}
+//		}
+//
+//	}
 return e_smooth;
 }

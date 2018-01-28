@@ -20,12 +20,12 @@ void resize_test();
 
 int main() {
 
-	//gauss_test();
+	gauss_test();
 	//derivative_test();
 	//sor_test();
 	//psi_test();
 	//energy_test();
-	resize_test();
+	//resize_test();
 
 	return 0;
 }
@@ -33,17 +33,17 @@ int main() {
 void gauss_test() {
 
 	int num_levels = 40;
-	double scale_factor = pow(0.95, num_levels);
+	double scale = pow(0.95, num_levels);
 
 	mat image1, image2;
 
-	image1.load("mats/main/Horizontal0.txt");
-	image2.load("mats/main/Horizontal1.txt");
+	image1.load("mats/g_smooth/gs_input-m.txt");
+	//image2.load("mats/main/Horizontal1.txt");
 
-	mat img1 = g_smooth(image1, scale_factor);
+	mat img1 = g_smooth(image1, scale);
 //	mat img2 = g_smooth(image2, scale_factor);
 
-	img1.save("mats/g_smooth/img1_smooth-c.txt", raw_ascii);
+	img1.save("mats/g_smooth/img_smooth-c.txt", raw_ascii);
 //	img2.save("mats/g_smooth/img2_smooth-c.txt", raw_ascii);
 
 }
