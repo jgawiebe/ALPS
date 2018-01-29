@@ -65,10 +65,15 @@ tuple<vec, uword> successive_overrelaxation( vec duv, uword failure, sp_mat A,
 	//continue to perform approximations until max iterations or accuracy is below the tolerance level
 	for (uword i = 0; i < inner_iter; i++) {
 		vec x_initial = x;
+		//U * x + b
 		approx = (N * x) + b;
 		cout << "HERE 1 " << endl;
+
+		//(D-L)^-1
 		tmpM = (mat) M;
 		cout << "HERE 2 " << endl;
+
+		//x = inv(L) * Ux + inv(L) * b
 		x = solve(tmpM, approx);
 		cout << "HERE 3 " << endl;
 		error = (norm(x - x_initial) / norm(x));
@@ -109,7 +114,11 @@ tuple<sp_mat, sp_mat, vec> split(sp_mat M, sp_mat N, vec b, sp_mat A,
 
 
 	b *= omega;
-	M = (omega * lwrDiagA) + diagA; // -1 parameter
+
+	//L = (D-wL)
+	M = (omega * lwrDiagA) + diagA; // -1 parameter]
+
+	//U = D - wU + (1-w)D)x
 	N = (-omega * uprDiagA) + ((1 - omega) * diagA); //1 parameter
 
 	return make_tuple(M, N, b);

@@ -7,13 +7,13 @@
 #include "gradient.hpp"
 #include "successive_overrelaxation.hpp"
 #include "energy_calc.hpp"
-#include "red-black-SOR.hpp"
+#include "red-black-SOR-v2.hpp"
 using namespace std;
 using namespace arma;
 
 void gauss_test();
 void gradient_test();
-void sor_test();
+//void sor_test();
 void rb_sor_test();
 void psi_test();
 void energy_test();
@@ -75,8 +75,10 @@ void rb_sor_test() {
 	mat img_z;
 	img_z.load("mats/derivatives/img_z-m.txt");
 
+
 	vec b;
 	b.load("mats/sor/b-m.txt");
+
 
 	uword ht = img_z.n_rows;
 	uword wt = img_z.n_cols;

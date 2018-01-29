@@ -11,20 +11,21 @@
 using namespace std;
 using namespace arma;
 
-//M: sor
+//A: sor
 //the solution 'x' is the vector 'duv'
 //failure flag can also be used outside this function
-tuple<vec, bool> redblack_sor(bool failure, mat A, vec x, vec b, double omega,
+tuple<vec, bool> redblack_sor(mat A, vec x, vec b, double omega,
 		int inner_iter, double tolerance) {
 
 	double error;
-	failure = true;
+	bool failure = true;
 
-	mat M(A);
-	//mat M(A.n_rows + 2, A.n_cols + 2, fill::zeros);
-	//mat M(500, 500, fill::zeros);
-	double approx = 0.0;
-	//M = (A * x) + b;
+	mat U(size(A), fill::zeros);
+	mat L(size(A), fill::zeros);
+	//mat A(A.n_rows + 2, A.n_cols + 2, fill::zeros);
+	//mat A(500, 500, fill::zeros);
+	double approx = 0.01;
+	//A = (A * x) + b;
 
 	//from matlab
 	double norml = norm(b);
@@ -32,89 +33,87 @@ tuple<vec, bool> redblack_sor(bool failure, mat A, vec x, vec b, double omega,
 		norml = 1;
 	}
 
-	for (uword i = 0; i < M.n_rows; i++) {
-		for (uword j = 0; j < M.n_cols; j++) {
-			if (i == 0) {
-				M.at(i, j) = 1.0;
-			} else {
-				M.at(i, j) = approx;
-			}
-		}
-	}
-
 //RED LOOP
-	double sum = 0.0;
 
 	for (int iter = 0; iter <= inner_iter; iter++) {
 		error = 0.0;
 
 		//RED odd cells
-		for (uword i = 2; i < M.n_rows; i += 2) { //start at first odd row, step by 2
-			for (uword j = 2; j < M.n_cols; j += 2) { //start at first odd col, step by 2
+		for (uword i = 2; i < A.n_rows; i += 2) { //start at first odd row, step by 2
+			for (uword j = 2; j < A.n_cols; j += 2) { //start at first odd col, step by 2
 
-				sum = (M.at(i - 1, j) + M.at(i, j) + M.at(i - 2, j - 1)
-						+ M.at(i - 1, j - 2)) * 0.25;
+				approx = (A.at(i - 1, j) + A.at(i, j) + A.at(i - 2, j - 1)
+						+ A.at(i - 1, j - 2)) / 4;
 
-				error = max(abs(omega * (sum - M.at(i - 1, j - 1))), error);
+				error = max(abs(omega * (approx - A.at(i - 1, j - 1))), error);
 
 				//trailing loop
-				M.at(i - 1, j - 1) = ((1 - omega) * M.at(i - 1, j - 1))
-						+ (omega * sum);
+				U.at(i - 1, j - 1) = ((1 - omega) * A.at(i - 1, j - 1))
+						+ (omega * approx); //Sr
 			}
 		}
 
 		//RED even cells
-		for (uword i = 2; i < M.n_rows; i += 2) { //start at first even row, step by 2
-			for (uword j = 2; j < M.n_cols; j += 2) { //start at first even col, step by 2
+		for (uword i = 2; i < A.n_rows; i += 2) { //start at first even row, step by 2
+			for (uword j = 2; j < A.n_cols; j += 2) { //start at first even col, step by 2
 
-				sum = (M.at(i - 1, j) + M.at(i, j) + M.at(i - 2, j - 1)
-						+ M.at(i - 1, j - 2)) * 0.25;
+				approx = (A.at(i - 1, j) + A.at(i, j) + A.at(i - 2, j - 1)
+						+ A.at(i - 1, j - 2)) / 4;
 
-				error = max(abs(omega * (sum - M.at(i - 1, j - 1))), error);
+				error = max(abs(omega * (approx - A.at(i - 1, j - 1))), error);
 
 				//trailing loop
-				M.at(i - 1, j - 1) = ((1 - omega) * M.at(i - 1, j - 1))
-						+ (omega * sum);
+				U.at(i - 1, j - 1) = ((1 - omega) * A.at(i - 1, j - 1))
+						+ (omega * approx);
 			}
 		}
 
 		//BLACK LOOP
 
 		//BLACK odd cells
-		for (uword i = 2; i < M.n_rows; i += 2) { //start at first odd row, step by 2
-			for (uword j = 3; j < M.n_cols; j += 2) { //start at second even col, step by 2
+		for (uword i = 2; i < A.n_rows; i += 2) { //start at first odd row, step by 2
+			for (uword j = 3; j < A.n_cols; j += 2) { //start at second even col, step by 2
 
-				sum = (M.at(i - 1, j) + M.at(i, j - 1) + M.at(i - 2, j - 1)
-						+ M.at(i - 1, j - 2)) * 0.25;
+				approx = (A.at(i - 1, j) + A.at(i, j - 1) + A.at(i - 2, j - 1)
+						+ A.at(i - 1, j - 2)) / 4;
 
-				error = max(abs(omega * (sum - M.at(i - 1, j - 1))), error);
+				error = max(abs(omega * (approx - A.at(i - 1, j - 1))), error);
 
 				//trailing loop
-				M.at(i - 1, j - 1) = ((1 - omega) * M.at(i - 1, j - 1))
-						+ (omega * sum);
+				L.at(i - 1, j - 1) = ((1 - omega) * A.at(i - 1, j - 1))
+						+ (omega * approx);
 			}
 		}
 
 		//BLACK even cells
-		for (uword i = 3; i < M.n_rows; i += 2) { //start at first even row, step by 2
-			for (uword j = 2; j < M.n_cols; j += 2) { //start at first even col, step by 2
+		for (uword i = 3; i < A.n_rows; i += 2) { //start at first even row, step by 2
+			for (uword j = 2; j < A.n_cols; j += 2) { //start at first even col, step by 2
 				//to avoid out of bounds erros, both loops are start ahead by 1
 
-				sum = (M.at(i - 1, j) + M.at(i, j - 1) + M.at(i - 2, j - 1)
-						+ M.at(i - 1, j - 2)) * 0.25;
+				approx = (A.at(i - 1, j) + A.at(i, j - 1) + A.at(i - 2, j - 1)
+						+ A.at(i - 1, j - 2)) / 4;
 
-				error = max(abs(omega * (sum - M.at(i - 1, j - 1))), error);
+				error = max(abs(omega * (approx - A.at(i - 1, j - 1))), error);
 
 				//trailing loop
-				M.at(i - 1, j - 1) = ((1 - omega) * M.at(i - 1, j - 1))
-						+ (omega * sum);
+				L.at(i - 1, j - 1) = ((1 - omega) * A.at(i - 1, j - 1))
+						+ (omega * approx);
 			}
 		}
 
 		if (error < tolerance) {
+
+			mat diagA = diagmat(A);
+			L = (diagA - omega * L);
+			U = ((omega * U) + ((1 - omega) * diagA)) * x;
+
+			//x = inv(L) * (U + 1);
+			x = L * (U + 1);
+
 			failure = false;
 			break; //convergence reached
 		}
+
 
 	}
 
