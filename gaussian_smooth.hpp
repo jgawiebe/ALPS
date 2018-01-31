@@ -21,7 +21,7 @@ mat g_smooth (mat img, double scale){
 
 	uvec limit;
 
-	mat smooth_img(img);
+	mat smooth_img;
 
 	if (1/scale < 0.1) {
 		smooth_img  = img;
@@ -46,14 +46,23 @@ mat g_smooth (mat img, double scale){
 
 	//M: smooth_img = conv2(grid, grid, img, "same");
 
+	vec temp;
+	rowvec temp_r; // = conv_to<rowvec>::from(temp);
+	rowvec temp_row;
+	rowvec grid_row(grid.size());
+	mat img_build;
+
 	//conv2(u,v,A) first convolves each column of A with the vector u, and then it convolves each row of the result with the vector v.
 	//VECS ARE DIFFERENT SIZE. HOW DOES MATLAB DO THIS??
 	for (uword i = 0; i < img.n_cols; i++) {
-		smooth_img.col(i) = conv(grid, smooth_img.col(i), "same");
+		temp = conv(grid, img.col(i));
+		img_build.insert_cols(i, temp);
 	}
-//	for (uword i = 0; i < img.n_rows; i++) {
-//		smooth_img.row(i) = conv2(grid, smooth_img.row(i), "same");
-//	}
+	for (uword i = 0; i < img.n_rows; i++) {
+		temp = conv(grid, img_build.row(i));
+		temp_r = conv_to<rowvec>::from(temp);
+		smooth_img.insert_rows(i, temp_r);
+	}
 
 	smooth_img.save("mats/g_smooth/img_smooth-c.txt", raw_ascii);
 //

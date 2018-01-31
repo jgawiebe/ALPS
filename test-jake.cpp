@@ -26,9 +26,9 @@ int main() {
 	//sor_test();
 	//psi_test();
 	//energy_test();
-	//resize_test();
+	resize_test();
 
-	rb_sor_test();
+	//rb_sor_test();
 
 	return 0;
 }
@@ -64,8 +64,6 @@ void gradient_test() {
 	img1_dx.save("mats/derivatives/img1_dx-c.txt", raw_ascii);
 	img1_dy.save("mats/derivatives/img1_dy-c.txt", raw_ascii);
 }
-
-
 
 void rb_sor_test() {
 	double omega = 1.8, tolerance = 1e-8;
@@ -123,8 +121,8 @@ void resize_test() {
 	mat u, v, img1;
 
 	img1.load("mats/main/img1-m.txt");
-	u.load("mats/energy/u-m.txt");
-	v.load("mats/energy/v-m.txt");
+	u.load("mats/main/u-in-m.txt");
+	v.load("mats/main/v-in-m.txt");
 
 	u.resize(img1.n_rows, img1.n_cols);
 	v.resize(size(u));

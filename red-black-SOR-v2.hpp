@@ -104,7 +104,9 @@ tuple<vec, bool> redblack_sor(mat A, vec x, vec b, double omega,
 		if (error < tolerance) {
 
 			mat diagA = diagmat(A);
+			//black cell matrix
 			L = (diagA - omega * L);
+			//red cell matrix
 			U = ((omega * U) + ((1 - omega) * diagA)) * x;
 
 			//x = inv(L) * (U + 1);
