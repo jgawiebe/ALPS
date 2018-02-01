@@ -9,7 +9,6 @@
 #include "energy_calc.hpp"
 #include "optical_flow.hpp"
 #include "red-black-SOR-v2.hpp"
-#include "bilinear.h"
 
 using namespace std;
 using namespace arma;
@@ -121,20 +120,20 @@ void energy_test() {
 }
 
 void resize_test() {
-	mat u, v, img1;
+	mat u, v, img;
 
-	img1.load("mats/main/img1-m.txt");
-	u.load("mats/main/u-in-m.txt");
+	img.load("mats/optical_flow/img-in.txt");
+	u.load("mats/optical_flow/u-in-m.txt");
 	//v.load("mats/main/v-in-m.txt");
 
-	u = bilinear_interpolation(u, u.n_rows, u.n_cols);
+	u = bilinear_interpolation(u, img.n_rows, img.n_cols);
 
 	//mat u2 = scale(u, u, 1, 1);
 
 //	u.resize(img1.n_rows, img1.n_cols);
 //	v.resize(size(u));
 
-	u.save("mats/main/u-c.txt", raw_ascii);
+	u.save("mats/optical_flow/u-out-c.txt", raw_ascii);
 	//v.save("mats/main/v-c.txt", raw_ascii);
 }
 

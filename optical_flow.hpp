@@ -15,7 +15,7 @@ using namespace std;
 using namespace arma;
 
 mat bilinear_interpolation(mat img_in, uword height, uword width);
-uword interpolate(uword s, uword e, uword t);
+double interpolate(double s, double e, double t);
 uword bilinear(uword c00, uword c10, uword c01, uword c11, uword tx, uword ty);
 
 //partial derivatives
@@ -61,29 +61,26 @@ mat bilinear_interpolation(mat img_in, uword height, uword width) {
 
 //		cout << "x: " << x;
 
-//these numbers get too high!!
 		gx = (x / dw) * (img_in.n_cols - 1);
 		gy = (y / dh) * (img_in.n_rows - 1);
 
 //		cout << "  gx: " << gx;
 
-		uword gx_int = floor(gx);
-		uword gy_int = floor(gy);
+		double gx_int = floor(gx);
+		double gy_int = floor(gy);
 
-		uword c00 = img_in(gy_int, gx_int);
-		uword c10 = img_in(gy_int + 1, gx_int);
-		uword c01 = img_in(gy_int, gx_int + 1);
-		uword c11 = img_in(gy_int + 1, gx_int + 1);
+		double c00 = img_in(gy_int, gx_int);
+		double c10 = img_in(gy_int + 1, gx_int);
+		double c01 = img_in(gy_int, gx_int + 1);
+		double c11 = img_in(gy_int + 1, gx_int + 1);
 
 		//for (uword i = 0; i < 3; i++) {
-//			img_out.at(x, y) = bilinear(c00, c10, c01, c11, gx - gx_int,
-//					gy - gy_int);
 		img_out.at(x, y) = interpolate(interpolate(c00, c10, gx - gx_int),
 				interpolate(c01, c11, gx - gx_int), gy - gy_int);
-
-		cout << "c: " << c00 << " ";
-		cout << img_out.at(x, y) << endl;
 		//}
+
+//		cout << "c: " << c00 << " ";
+//		cout << img_out.at(x, y) << endl;
 
 		//when x gets to end, reset col and increment row
 		if (x == (width - 1)) {
@@ -98,7 +95,7 @@ mat bilinear_interpolation(mat img_in, uword height, uword width) {
 //	return interpolate(interpolate(c00, c10, tx), interpolate(c01, c11, tx), ty);
 //}
 
-uword interpolate(uword s, uword e, uword t) {
+double interpolate(double s, double e, double t) {
 	return s + (e - s) * t;
 }
 
