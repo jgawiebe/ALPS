@@ -5,9 +5,12 @@
 
 #include "gaussian_smooth.hpp"
 #include "gradient.hpp"
-#include "successive_overrelaxation.hpp"
+//#include "successive_overrelaxation.hpp"
 #include "energy_calc.hpp"
+#include "optical_flow.hpp"
 #include "red-black-SOR-v2.hpp"
+#include "bilinear.h"
+
 using namespace std;
 using namespace arma;
 
@@ -122,13 +125,17 @@ void resize_test() {
 
 	img1.load("mats/main/img1-m.txt");
 	u.load("mats/main/u-in-m.txt");
-	v.load("mats/main/v-in-m.txt");
+	//v.load("mats/main/v-in-m.txt");
 
-	u.resize(img1.n_rows, img1.n_cols);
-	v.resize(size(u));
+	u = bilinear_interpolation(u, u.n_rows, u.n_cols);
+
+	//mat u2 = scale(u, u, 1, 1);
+
+//	u.resize(img1.n_rows, img1.n_cols);
+//	v.resize(size(u));
 
 	u.save("mats/main/u-c.txt", raw_ascii);
-	v.save("mats/main/v-c.txt", raw_ascii);
+	//v.save("mats/main/v-c.txt", raw_ascii);
 }
 
 //void sor_test() {

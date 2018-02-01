@@ -6,13 +6,17 @@
 
 #include <iostream>
 #include <armadillo>
-#include "gradient.hpp"
-#include "energy_calc.hpp"
-#include "matrix_builder.hpp"
+//#include "gradient.hpp"
+//#include "energy_calc.hpp"
+//#include "matrix_builder.hpp"
 #include "successive_overrelaxation.hpp"
 
 using namespace std;
 using namespace arma;
+
+mat bilinear_interpolation(mat img_in, uword height, uword width);
+uword interpolate(uword s, uword e, uword t);
+uword bilinear(uword c00, uword c10, uword c01, uword c11, uword tx, uword ty);
 
 //partial derivatives
 mat img1_dx, img1_dy;
@@ -37,10 +41,120 @@ void compute_derivatives(mat img1, mat img2) {
 	dyz = img2_dy - img1_dy;
 }
 
+mat bilinear_interpolation(mat img_in, uword height, uword width) {
+
+	cout << img_in;
+
+	mat img_out(height, width);
+
+	//https://rosettacode.org/wiki/Bilinear_interpolation
+//	uword height = img_size.n_rows;
+//	uword width = img_size.n_cols;
+
+	double gx, gy;
+	//uword y = 0.0;
+	double dw = (double) width;
+	double dh = (double) height;
+
+//currently ignoring left and bottom edges
+	for (uword x = 0.0, y = 0.0; y < (height); x++) {
+
+//		cout << "x: " << x;
+
+//these numbers get too high!!
+		gx = (x / dw) * (img_in.n_cols - 1);
+		gy = (y / dh) * (img_in.n_rows - 1);
+
+//		cout << "  gx: " << gx;
+
+		uword gx_int = floor(gx);
+		uword gy_int = floor(gy);
+
+		uword c00 = img_in(gy_int, gx_int);
+		uword c10 = img_in(gy_int + 1, gx_int);
+		uword c01 = img_in(gy_int, gx_int + 1);
+		uword c11 = img_in(gy_int + 1, gx_int + 1);
+
+		//for (uword i = 0; i < 3; i++) {
+//			img_out.at(x, y) = bilinear(c00, c10, c01, c11, gx - gx_int,
+//					gy - gy_int);
+		img_out.at(x, y) = interpolate(interpolate(c00, c10, gx - gx_int),
+				interpolate(c01, c11, gx - gx_int), gy - gy_int);
+
+		cout << "c: " << c00 << " ";
+		cout << img_out.at(x, y) << endl;
+		//}
+
+		//when x gets to end, reset col and increment row
+		if (x == (width - 1)) {
+			x = 0;
+			y++;
+		}
+	}
+	return img_out;
+}
+
+//uword bilinear(uword c00, uword c10, uword c01, uword c11, uword tx, uword ty) {
+//	return interpolate(interpolate(c00, c10, tx), interpolate(c01, c11, tx), ty);
+//}
+
+uword interpolate(uword s, uword e, uword t) {
+	return s + (e - s) * t;
+}
+
+//mat bilinear_interpolation(mat img_in, mat img_size) {
+//	uword srows = img_in.n_rows / img_size.n_rows;
+//	uword scols = img_in.n_cols / img_size.n_cols;
+//
+//	mat row_mat, col_mat;
+//
+//	for (uword i = 0; i < img_size.n_cols; i++) {
+//		col_mat.col(i) = i;
+//	}
+//
+//	for (uword i = 0; i < img_size.n_rows; i++) {
+//		row_mat.row(i) = i;
+//	}
+//
+//	col_mat *= scols;
+//	row_mat *= srows;
+//
+//	mat col = floor(col_mat);
+//	mat row = floor(row_mat);
+//
+//	//normalize values in both mats
+//	for (uword i = 0; i < col.n_elem; i++) {
+//		if (col(i) < 1) {
+//			col(i) = 1;
+//		} else if (col(i) > img_size.n_cols - 1) {
+//			col(i) = img_size.n_cols - 1;
+//		}
+//		if (row(i) < 1) {
+//			row(i) = 1;
+//		} else if (row(i) > img_size.n_rows - 1) {
+//			row(i) = img_size.n_rows - 1;
+//		}
+//	}
+//
+//	mat delta_c = col_mat - col;
+//	mat delta_r = row_mat - row;
+//
+//	//vec ix1 = sub2ind(size(img_in), );
+//
+//	mat output_img;
+//	for (uword i = 0; i < col.n_elem; i++) {
+//
+//	}
+//
+//
+//	//TEMPORARY
+//	return row_mat;
+//
+//}
+
 //M: resolutionProcess
 tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
-		mat u, mat v,
-	int outer_iter, int inner_iter) {
+		mat u, mat v, int outer_iter, int inner_iter) {
 	uword fail_flag = 0;
 	double tolerance = 1e-8;
 
@@ -67,8 +181,6 @@ tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
 	//get second derivatives of img2_dy
 	gradient(dyx, dyy, img2_dy);
 
-
-
 	for (int i = 0; i < outer_iter; i++) {
 
 		//can i call this from another header?
@@ -82,10 +194,10 @@ tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
 
 		//tie(A, b) = build_matrix(A, b, img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (alpha * e_smooth), u, v, gamma);
 
-		duv = successive_overrelaxation(&fail_flag, A, duv, b, omega,
-				inner_iter, tolerance);
+//		duv = successive_overrelaxation(&fail_flag, A, duv, b, omega,
+//				inner_iter, tolerance);
 
-		if(fail_flag == true) {
+		if (fail_flag == true) {
 			continue; //did not reach convergence, must try again
 		}
 
