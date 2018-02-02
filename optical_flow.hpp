@@ -6,9 +6,9 @@
 
 #include <iostream>
 #include <armadillo>
-//#include "gradient.hpp"
-//#include "energy_calc.hpp"
-//#include "matrix_builder.hpp"
+#include "gradient.hpp"
+#include "energy_calc.hpp"
+#include "matrix_builder.hpp"
 #include "successive_overrelaxation.hpp"
 
 using namespace std;
@@ -57,7 +57,7 @@ mat bilinear_interpolation(mat img_in, uword height, uword width) {
 	double dh = (double) height;
 
 //currently ignoring left and bottom edges
-	for (uword x = 0.0, y = 0.0; y < (height); x++) {
+	for (uword x = 0, y = 0; y < (height); x++) {
 
 //		cout << "x: " << x;
 
@@ -152,13 +152,13 @@ double interpolate(double s, double e, double t) {
 //M: resolutionProcess
 tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
 		mat u, mat v, int outer_iter, int inner_iter) {
-	uword fail_flag = 0;
+	bool fail_flag = 0;
 	double tolerance = 1e-8;
 
 	mat dxx, dxy;
 	mat dyx, dyy;
 	mat du(img_z), dv(img_z);
-	mat e_smooth, e_data(size(du), fill::zeros);
+	mat e_smooth, e_data(du.n_rows, du.n_cols, fill::zeros);
 
 	//get ht and wt from size of img_z
 	int ht = img_z.n_rows;
@@ -194,7 +194,7 @@ tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
 //		duv = successive_overrelaxation(&fail_flag, A, duv, b, omega,
 //				inner_iter, tolerance);
 
-		if (fail_flag == true) {
+		if (fail_flag) {
 			continue; //did not reach convergence, must try again
 		}
 

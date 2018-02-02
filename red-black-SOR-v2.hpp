@@ -20,8 +20,8 @@ tuple<vec, bool> redblack_sor(mat A, vec x, vec b, double omega,
 	double error;
 	bool failure = true;
 
-	mat U(size(A), fill::zeros);
-	mat L(size(A), fill::zeros);
+	mat U(A.n_rows, A.n_cols, fill::zeros);
+	mat L(A.n_rows, A.n_cols, fill::zeros);
 	//mat A(A.n_rows + 2, A.n_cols + 2, fill::zeros);
 	//mat A(500, 500, fill::zeros);
 	double approx = 0.01;

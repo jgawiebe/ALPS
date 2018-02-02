@@ -37,8 +37,8 @@ int main() {
 	mat img2 = g_smooth(image2, scale_factor);
 	
 	//define u and v matrices
-	mat u(size(img1), fill::zeros);
-	mat v(size(img1), fill::zeros);
+	mat u(img1.n_rows, img1.n_cols, fill::zeros);
+	mat v(img1.n_rows, img1.n_cols, fill::zeros);
 
 	//check this loop
 	for (int i = 0; i < num_levels; i++) {
@@ -68,7 +68,7 @@ int main() {
 		v.load("mats/energy/v-m.txt");
 
 		u.resize(img1.n_rows, img1.n_cols);
-		v.resize(size(u));
+		v.resize(img1.n_rows, img1.n_cols);
 
 		u.save("mats/energy/u-c.txt");
 		v.save("mats/energy/v-c.txt");

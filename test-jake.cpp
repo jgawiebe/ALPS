@@ -4,9 +4,9 @@
 #include <armadillo>
 
 #include "gaussian_smooth.hpp"
-#include "gradient.hpp"
+//#include "gradient.hpp"
 //#include "successive_overrelaxation.hpp"
-#include "energy_calc.hpp"
+//#include "energy_calc.hpp"
 #include "optical_flow.hpp"
 #include "red-black-SOR-v2.hpp"
 

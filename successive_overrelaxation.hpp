@@ -48,7 +48,7 @@ tuple<vec, uword> successive_overrelaxation( vec duv, uword failure, sp_mat A,
 	error = (norm(r) / norml);
 	cout << "Test line 48" << endl;
 	if (all(error < tolerance)) { //matrix is already within tolerance, done
-		mat fail_mat(size(A), fill::zeros);
+		mat fail_mat(A.n_rows, A.n_cols, fill::zeros);
 		duv = x;
 		return make_tuple(duv,failure);
 	}

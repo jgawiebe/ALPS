@@ -22,8 +22,8 @@ mat psi_function(mat x) {
 
 //M: computee_smooth_brox
 mat generate_esmooth(mat u, mat v) {
-	double height = u.n_rows;
-	double width = u.n_cols;
+	uword height = u.n_rows;
+	uword width = u.n_cols;
 
 	uword x = 0, y = 0;
 
