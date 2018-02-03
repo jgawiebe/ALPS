@@ -43,7 +43,7 @@ void compute_derivatives(mat img1, mat img2) {
 
 mat bilinear_interpolation(mat img_in, uword height, uword width) {
 
-	cout << img_in;
+	//cout << img_in;
 
 	mat img_out(height, width);
 
