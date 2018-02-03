@@ -12,7 +12,7 @@ using namespace std;
 using namespace arma;
 
 mat psi_function(mat x) {
-
+	//tested on Jan 30 works
 	//M: psiDerivative
 	const double epsilon = 0.001;
 	x = 1 / ((2 * (sqrt(x + epsilon))));
@@ -20,12 +20,10 @@ mat psi_function(mat x) {
 	return x;
 }
 
-//M: computee_smooth_brox
+//M: computePsidashFS_brox
 mat generate_esmooth(mat u, mat v) {
-	uword height = u.n_rows;
-	uword width = u.n_cols;
-
-	uword x = 0, y = 0;
+	double height = u.n_rows;
+	double width = u.n_cols;
 
 	mat e_smooth(2 * height + 1, 2 * width + 1, fill::zeros);
 	//mat e_temp(e_smooth);
@@ -79,45 +77,28 @@ mat generate_esmooth(mat u, mat v) {
 //	e_smooth( 1:2:end, 2:2:end ) = psiDerivative( uypd + vypd ) ;
 //	e_smooth( 2:2:end, 1:2:end ) = psiDerivative( uxpd + vxpd ) ;
 
-//	uword y = 0;
-//	uword x = 1;
-//	for (uword row = 0; row < e_smooth.n_rows; row += 2) {
-//		for (uword col = 1; col < e_smooth.n_cols; col += 2) {
-//			x = 1;
-//			e_smooth.at(row, col) = temp_y.at(x, y);
-//			if (x == temp_x.n_cols - 1) {
-//				y++;
-//				//			} else if (y == temp_y.n_rows - 1) {
-//				//				return e_smooth;
-//			} else {
-//				x++;
-//			}
-//		}
-//	}
+	uword y = 0;
+	uword x = 0;
+	for (uword row = 1; row < e_smooth.n_rows; row += 2) {
+		for (uword col = 1; col < e_smooth.n_cols; col += 2) {
 
-//	for (uword row = 0; row < e_smooth.n_rows; row++) {
-//		for (uword col = 0; col < e_smooth.n_cols; col++) {
-//			if ((col % 2) && !(row % 2)) { //odd col, even row
-//				e_smooth.at(row, col) = temp_y.at(x, y);
-//			} else if (!(col % 2) && (row % 2)) { //even col, odd row
-////				e_smooth.at(row, col) = temp_x.at(x, y);
-//			} else {
-//				continue; //don't increment x, y if nothing is written
-//			}
-//			// simple step through matrix
-//			if (x == temp_x.n_cols - 1) {
-//				x = 0;
-//				y++;
-////			} else if (y == temp_y.n_rows - 1) {
-////				return e_smooth;
-//			} else {
-//				x++;
-//			}
-////			if (col == 40) {
-////				e_smooth.save("mats/energy/e_smooth-c.txt", raw_ascii);
-////			}
-//		}
-//
-//	}
+			e_smooth(row-1, col) = temp_y(x, y); //vert edge case
+			e_smooth(row, col-1) = temp_x(x, y); //right edge case
+
+			if (row == ((e_smooth.n_rows)) - 2){
+				e_smooth(row+1, col) = temp_y(x, y); //vert edge case
+			}
+
+			if (col == ((e_smooth.n_cols)) - 2){
+				e_smooth(row, col+1) = temp_x(x, y); //right edge case
+			}
+
+			y++;
+		}
+		y=0;
+		x++;
+	}
+
+
 return e_smooth;
 }
