@@ -28,9 +28,9 @@ int main() {
 	//sor_test();
 	//psi_test();
 	//energy_test();
-	resize_test();
+	//resize_test();
 
-	//rb_sor_test();
+	rb_sor_test();
 
 	return 0;
 }
@@ -86,7 +86,7 @@ void rb_sor_test() {
 
 	mat A(side_length, side_length, fill::zeros);
 
-	//A.load("mats/sor/du-m.txt");
+	A.load("mats/sor/du-m.txt");
 
 	mat du, dv;
 	vec duv(ht * wt * 2, fill::zeros);
