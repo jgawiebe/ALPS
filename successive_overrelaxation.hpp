@@ -48,7 +48,7 @@ tuple<vec, uword> successive_overrelaxation( vec duv, uword failure, sp_mat A,
 	error = (norm(r) / norml);
 	cout<<"Test line 48"<<endl;
 	if (all(error < tolerance)) { //matrix is already within tolerance, done
-		mat fail_mat(size(A), fill::zeros);
+		mat fail_mat(A.n_rows, A.n_cols, fill::zeros);
 		duv = x;
 		return make_tuple(duv,failure);
 	}
@@ -66,17 +66,16 @@ tuple<vec, uword> successive_overrelaxation( vec duv, uword failure, sp_mat A,
 	for (uword i = 0; i < inner_iter; i++) {
 		vec x_initial = x;
 	    approx = (N * x) + b;
-		cout<<"HERE 1 "<<endl;
+		cout<<"Make approximation"<<endl;
 		tmpM = (mat)M;
-		cout<<"HERE 2 "<<endl;
+		cout << "Solving for x..." << endl;
 		x = solve(tmpM, approx);
-		cout<<"HERE 3 "<<endl;
 		error = (norm(x - x_initial) / norm(x));
 		if (all(error <= tolerance)) {
 			break; //approximation is within tolerance
 		}
 
-		 cout<<"Iteration "<<i<<" Error: "<<error<<endl;
+		 cout<<"Iteration "<<i<<" complete. Error is: "<<error<<endl;
 	}
 
 
@@ -84,7 +83,7 @@ tuple<vec, uword> successive_overrelaxation( vec duv, uword failure, sp_mat A,
 	//just commenting them out for now
     //b /= omega;
 	//r = b - (A * x);
-	cout<<"Test line 78"<<endl;
+	cout<<"Approximation complete"<<endl;
 
 	if (any(error > tolerance)) {
 		failure = 1; //convergence not found set failure to true

@@ -49,3 +49,5 @@ test
 *.filters
 /EEE457-C.vcxproj
 /EEE457-C.sln
+/x64/Release
+*.user

@@ -18,15 +18,18 @@ using namespace arma;
 int main() {
 
 	//non-matrices: alpha, dt, gamma, ht, i, num_levels, wt
-	double alpha = 30.0, gamma = 80.0, omega = 1.8; //check omega value
+	double alpha = 30.0, gamma = 80.0, omega = 1.8;
 	int num_levels = 40, outer_iter = 3, inner_iter = 500;
 	
 	double scale_factor = pow(0.95, num_levels);
 	
 	mat du, dv;
 
-	//**get images using opencv**
+	//BONUS: get images using opencv
 	mat image1, image2;
+
+	image1.load("/mats/main/img1-m.txt");
+	image2.load("/mats/main/img2-m.txt");
 
 	//get size of image
 	int height = image1.n_rows;
@@ -60,18 +63,15 @@ int main() {
 		//scale images to current level of pyramid
 		img1 = g_smooth(image1, scale_factor);
 		img2 = g_smooth(image2, scale_factor);
-		
-		//M: u = imresize( u, [size(im1_hr, 1), size(im1_hr, 2)], 'bilinear' );
-		
-		//resize flow to the current resolution (assuming bilinear)
-		u.load("mats/energy/u-m.txt");
-		v.load("mats/energy/v-m.txt");
 
-		u.resize(img1.n_rows, img1.n_cols);
-		v.resize(img1.n_rows, img1.n_cols);
-
+		//compare with u-m, v-m
 		u.save("mats/energy/u-c.txt");
 		v.save("mats/energy/v-c.txt");
+		
+		//resize flow to the current resolution (assuming bilinear)
+
+		//u.resize(img1.n_rows, img1.n_cols);
+		//v.resize(img1.n_rows, img1.n_cols);
 	}
 
 	return 1;
