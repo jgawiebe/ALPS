@@ -13,6 +13,9 @@ using namespace arma;
 
 //M: gaussDeriv
 tuple<mat, mat> gradient(mat x_deriv, mat y_deriv, mat I) {
+
+	printf("Generating gradient of a %u by %u matrix...", x_deriv.n_rows, x_deriv.n_cols);
+
 	//int sigma = 1;
   int limit = 1000;
 	//int variance = 1;
@@ -35,10 +38,12 @@ tuple<mat, mat> gradient(mat x_deriv, mat y_deriv, mat I) {
 	derivative = -derivative % temp;
 	derivative = derivative(find(abs(derivative) > thresh));
 
-	derivative.save("mats/gradient/deriv-c.txt", raw_ascii);
+	//derivative.save("mats/gradient/deriv-c.txt", raw_ascii);
 
 	x_deriv = conv2(I, derivative.t(), "same");
 	y_deriv = conv2(I, derivative, "same");
+
+	cout << " done" << endl;
 
 	return make_tuple(x_deriv, y_deriv);
 }

@@ -26,6 +26,8 @@ mat generate_esmooth(mat u, mat v) {
 	double width = u.n_cols;
 
 	mat e_smooth(2 * height + 1, 2 * width + 1, fill::zeros);
+
+	cout << "Generating E_smooth >" << endl;
 	//mat e_temp(e_smooth);
 
 	mat temp(1, 2), tr_temp(1, 2); //transposition of temp matrix
@@ -52,8 +54,8 @@ mat generate_esmooth(mat u, mat v) {
 	mat delta_ux = conv2(u_dy2, (temp / 2));      //t
 	delta_ux.shed_row(u_dy2.n_rows - 1);
 	mat u_pdx = pow(u_dx.submat(0, 0, u_dx.n_rows - 1, delta_ux.n_cols - 1), 2)
-			+ pow(delta_ux.submat(0, 0, u_dx.n_rows - 1, delta_ux.n_cols - 1),
-					2);
+		+ pow(delta_ux.submat(0, 0, u_dx.n_rows - 1, delta_ux.n_cols - 1),
+			2);
 
 	mat delta_uy = conv2(u_dx2, tr_temp / 2);     //t
 	delta_uy.shed_col(u_dx2.n_cols - 1);
@@ -62,43 +64,46 @@ mat generate_esmooth(mat u, mat v) {
 	mat delta_vx = conv2(v_dy2, temp / 2);       //adding row
 	delta_vx.shed_row(v_dy2.n_rows - 1);
 	mat v_pdx = pow(v_dx.submat(0, 0, v_dx.n_rows - 1, delta_vx.n_cols - 1), 2)
-			+ pow(delta_vx.submat(0, 0, v_dx.n_rows - 1, delta_vx.n_cols - 1),
-					2);
+		+ pow(delta_vx.submat(0, 0, v_dx.n_rows - 1, delta_vx.n_cols - 1),
+			2);
 
 	mat delta_vy = conv2(v_dx2, tr_temp / 2);     //adding col
 	delta_vy.shed_col(v_dx2.n_cols - 1);
 	mat v_pdy = pow(v_dy.submat(0, 0, delta_vy.n_rows - 1, v_dy.n_cols - 1), 2)
-			+ pow(delta_vy.submat(0, 0, delta_vy.n_rows - 1, v_dy.n_cols - 1),
-					2);
+		+ pow(delta_vy.submat(0, 0, delta_vy.n_rows - 1, v_dy.n_cols - 1),
+			2);
 
 	mat temp_x = psi_function(u_pdx + v_pdx);
 	mat temp_y = psi_function(u_pdy + v_pdy);
 
-//	e_smooth( 1:2:end, 2:2:end ) = psiDerivative( uypd + vypd ) ;
-//	e_smooth( 2:2:end, 1:2:end ) = psiDerivative( uxpd + vxpd ) ;
+	//	e_smooth( 1:2:end, 2:2:end ) = psiDerivative( uypd + vypd ) ;
+	//	e_smooth( 2:2:end, 1:2:end ) = psiDerivative( uxpd + vxpd ) ;
 
 	uword y = 0;
 	uword x = 0;
+
+	cout << "    Building matrix..." << endl;
 	for (uword row = 1; row < e_smooth.n_rows; row += 2) {
 		for (uword col = 1; col < e_smooth.n_cols; col += 2) {
 
-			e_smooth(row-1, col) = temp_y(x, y); //vert edge case
-			e_smooth(row, col-1) = temp_x(x, y); //right edge case
+			e_smooth(row - 1, col) = temp_y(x, y); //vert edge case
+			e_smooth(row, col - 1) = temp_x(x, y); //right edge case
 
-			if (row == ((e_smooth.n_rows)) - 2){
-				e_smooth(row+1, col) = temp_y(x, y); //vert edge case
+			if (row == ((e_smooth.n_rows)) - 2) {
+				e_smooth(row + 1, col) = temp_y(x, y); //vert edge case
 			}
 
-			if (col == ((e_smooth.n_cols)) - 2){
-				e_smooth(row, col+1) = temp_x(x, y); //right edge case
+			if (col == ((e_smooth.n_cols)) - 2) {
+				e_smooth(row, col + 1) = temp_x(x, y); //right edge case
 			}
 
 			y++;
 		}
-		y=0;
+		y = 0;
 		x++;
 	}
 
-
-return e_smooth;
+	cout << " done" << endl;
+	cout << "> E_smooth complete" << endl;
+	return e_smooth;
 }

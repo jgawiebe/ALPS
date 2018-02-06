@@ -17,6 +17,8 @@ using namespace arma;
 tuple<vec, bool> redblack_sor(mat A, vec x, vec b, double omega,
 	int inner_iter, double tolerance) {
 
+	cout << "performing Red / Black SOR >" << endl;
+
 	double error = 0.0;
 	bool failure = true;
 
@@ -36,6 +38,7 @@ tuple<vec, bool> redblack_sor(mat A, vec x, vec b, double omega,
 	//RED LOOP
 
 	for (int iter = 0; iter <= inner_iter; iter++) {
+		cout << "Complete iteration " << iter << endl;
 
 		//RED odd cells
 		for (uword i = 2; i < A.n_rows; i += 2) { //start at first odd row, step by 2
@@ -97,11 +100,13 @@ tuple<vec, bool> redblack_sor(mat A, vec x, vec b, double omega,
 				//trailing loop
 				L.at(i - 1, j - 1) = ((1 - omega) * A.at(i - 1, j - 1))
 					+ (omega * approx);
+				//printf("L is %.01f\n", L.at(i - 1, j - 1));
 			}
 		}
 
-		if (error < tolerance) {
-
+		cout << "Error is:" <<error<< endl;
+		//if (error < tolerance) {
+			cout << "Error is under tolerance level"<< endl;
 			mat diagA = diagmat(A);
 
 
@@ -114,11 +119,12 @@ tuple<vec, bool> redblack_sor(mat A, vec x, vec b, double omega,
 			cout << "    RED: " << U;
 
 			x = inv(L) * (U + 1);
+			cout << "THIS: "<< x.at(0) << endl;
 			//x = L * (U + 1);
 
-			failure = false;
-			break; //convergence reached
-		}
+			//failure = false;
+			//break; //convergence reached
+		//}
 
 
 	}

@@ -6,44 +6,63 @@
 
 #include <iostream>
 #include <armadillo>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+#include "bilinear_resize.hpp"
 #include "optical_flow.hpp"
 #include "gaussian_smooth.hpp"
 
 using namespace std;
 using namespace arma;
+using namespace cv;
 
 //compile with: g++ <funtion>.cpp -o test -O2 -larmadillo; ./test
 
 //M: optic_flow_brox
 int main() {
-
-	//non-matrices: alpha, dt, gamma, ht, i, num_levels, wt
-	double alpha = 30.0, gamma = 80.0, omega = 1.8;
-	int num_levels = 40, outer_iter = 3, inner_iter = 500;
+	//set constants
+	const double alpha = 30.0, gamma = 80.0, omega = 1.8;
+	const int num_levels = 2, outer_iter = 3, inner_iter = 5;
 	
+	//set intial scale factor
 	double scale_factor = pow(0.95, num_levels);
 	
-	mat du, dv;
+	//initialize input matrices
+	mat image1 = to_arma(imread("car0.png", CV_LOAD_IMAGE_GRAYSCALE));
+	mat image2 = to_arma(imread("car1.png", CV_LOAD_IMAGE_GRAYSCALE));
 
-	//BONUS: get images using opencv
-	mat image1, image2;
+	if (image1.n_elem == 0 || image2.n_elem == 0) {
+		cout << "error: images could not be opened" << endl;
+		system("pause"); //wait for any key press
+		return -1;
+	}
+	else {
+		cout << "Images loaded successfully" << endl;
 
-	image1.load("/mats/main/img1-m.txt");
-	image2.load("/mats/main/img2-m.txt");
+		//DON'T USE THIS WHEN BENCHMARKING
+		//String window_name1 = "Initial Image 1";
+		//String window_name2 = "Initial Image 2";
 
-	//get size of image
-	int height = image1.n_rows;
-	int width = image1.n_cols;
-	
+		//namedWindow(window_name1);
+		//namedWindow(window_name2);
+
+		//cv::imshow(window_name1, to_cvmat(image1));
+		//cv::imshow(window_name2, to_cvmat(image2));
+	}
+
 	//perform guassian scaling on images
 	mat img1 = g_smooth(image1, scale_factor);
 	mat img2 = g_smooth(image2, scale_factor);
-	
+
 	//define u and v matrices
 	mat u(img1.n_rows, img1.n_cols, fill::zeros);
 	mat v(img1.n_rows, img1.n_cols, fill::zeros);
 
-	//check this loop
+	//define du and dv matrices
+	mat du, dv;
+
+	//levels of the guassian pyramid
 	for (int i = 0; i < num_levels; i++) {
 		
 		//resolution increases with each pyramid level
@@ -55,25 +74,30 @@ int main() {
 		//perform optical_flow to get du and dv
 		tie(u, v, du, dv) = optical_flow(alpha, gamma, omega, u, v, outer_iter,
 				inner_iter);
-		
+
 		//add incremental change in x and y domain
 		u = u + du;
 		v = v + dv;
 		
-		//scale images to current level of pyramid
+		//scale original images to next level of the pyramid
 		img1 = g_smooth(image1, scale_factor);
 		img2 = g_smooth(image2, scale_factor);
+
+		//resize to current resolution
+		bilinear_resize(u, img1);
+		bilinear_resize(v, img1);
+
 
 		//compare with u-m, v-m
 		u.save("mats/energy/u-c.txt");
 		v.save("mats/energy/v-c.txt");
-		
-		//resize flow to the current resolution (assuming bilinear)
 
-		//u.resize(img1.n_rows, img1.n_cols);
-		//v.resize(img1.n_rows, img1.n_cols);
+		img1.save("mats/main/img1-output.txt");
+		img2.save("mats/main/img2-output.txt");
+
+		printf("%d / %d levels of guassian pyramid complete", i + 1, num_levels);
 	}
 
-	return 1;
+	return 0;
 }
 

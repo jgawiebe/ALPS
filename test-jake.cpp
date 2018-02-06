@@ -2,16 +2,19 @@
 #include <fstream>
 
 #include <armadillo>
+#include <opencv2/opencv.hpp>
 
 #include "gaussian_smooth.hpp"
 //#include "gradient.hpp"
 //#include "successive_overrelaxation.hpp"
 //#include "energy_calc.hpp"
 #include "optical_flow.hpp"
-#include "red-black-SOR-v2.hpp"
+#include "red-black-SOR.hpp"
+#include "bilinear_resize.hpp"
 
 using namespace std;
 using namespace arma;
+using namespace cv;
 
 void gauss_test();
 void gradient_test();
@@ -28,9 +31,9 @@ int main() {
 	//sor_test();
 	//psi_test();
 	//energy_test();
-	//resize_test();
+	resize_test();
 
-	rb_sor_test();
+	//rb_sor_test();
 
 	return 0;
 }
@@ -120,47 +123,50 @@ void energy_test() {
 }
 
 void resize_test() {
-	mat u, v, img;
+	mat u, img_size;
 
-	img.load("mats/optical_flow/img-in.txt");
-	u.load("mats/optical_flow/u-in-m.txt");
-	//v.load("mats/main/v-in-m.txt");
+	u.load("mats/resize/u_in.txt");
+	img_size.load("mats/resize/img_size.txt");
 
-	u = bilinear_interpolation(u, img.n_rows, img.n_cols);
+	u = bilinear_resize(u, img_size);
 
-	//mat u2 = scale(u, u, 1, 1);
+	/*cv::Mat cv_u = to_cvmat(u);
+	cv::Mat cv_img = to_cvmat(img_size);
 
-//	u.resize(img1.n_rows, img1.n_cols);
-//	v.resize(size(u));
+	resize(cv_u, cv_u, cv_img.size());
 
-	u.save("mats/optical_flow/u-out-c.txt", raw_ascii);
+	arma::mat u_rx = to_arma(cv_u);*/
+
+
+
+	//cv::Mat cv_u(cv_u.rows, cv_u.cols, CV_64FC1, u.memptr());
+	//cv::Mat cv_img(cv_img.rows, cv_img.cols, CV_64FC1, img1.memptr());
+
+	//cv::Mat_<double>{int(u.n_cols), int(u.n_rows), const_cast<double*>(u.memptr())};
+
+
+	
+
+	//cv::Mat cv_img = to_cvmat(img_size);
+
+	//int cols = img1.n_cols;
+	//int rows = img1.n_rows;
+
+	//cv::FileStorage storage("test.yml", cv::FileStorage::WRITE);
+	//storage << "img" << img;
+	//storage.release();
+
+	//resize(cv_img, cv_u, cv_u.size());
+
+	//arma::mat img_rx(reinterpret_cast<double*>(cv_img.data), cv_img.cols, cv_img.rows);
+	//arma::mat u_rx(reinterpret_cast<double*>(cv_u.data), cv_u.cols, cv_u.rows);
+
+	
+
+	/*cout << "input col >" << u.n_cols << " row >" << u.n_rows << endl;
+	cout << "img col >" << img_size.n_cols << " row >" << img_size.n_rows << endl;
+	cout << "output col >" << u_rx.n_cols << " row >" << u_rx.n_rows << endl;
+*/
+	u.save("mats/resize/u_c.txt", raw_ascii);
 	//v.save("mats/main/v-c.txt", raw_ascii);
 }
-
-//void sor_test() {
-//	double omega = 1.8, tolerance = 1e-8;
-//	int inner_iter = 500;
-//	uword fail_flag = 0;
-//
-//	mat img_z;
-//	img_z.load("mats/derivatives/img_z-m.txt");
-//
-//	vec b;
-//	b.load("mats/sor/b-m.txt");
-//
-//	uword ht = img_z.n_rows;
-//	uword wt = img_z.n_cols;
-//	uword side_length = (ht * wt * 2);
-//
-//	mat A(side_length, side_length);
-//
-//	A.load("mats/sor/A-m.txt");
-//
-//	mat du, dv;
-//	vec duv(ht * wt * 2, fill::zeros);
-//
-//	duv = successive_overrelaxation(A, fail_flag, duv, b, omega, inner_iter,
-//			tolerance);
-//
-//	duv.save("mats/sor/duv-c.txt", raw_ascii);
-//}
