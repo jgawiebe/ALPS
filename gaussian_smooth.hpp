@@ -2,6 +2,7 @@
 guassian_smooth.hpp
 Jacob Wiebe & James Dolman
 Rev1: Nov 2017
+Rev2: Feb 2018 TESTING PASSED 
 */
 
 #include <iostream>
