@@ -2,7 +2,6 @@
 energy_calc.hpp
 Jacob Wiebe & James Dolman
 Rev1: Nov 2017
-Rev2: Feb 2017 TESTING PASSED 
 */
 
 #include <iostream>
@@ -16,10 +15,12 @@ using namespace arma;
 // int height = 0, width = 0;
 
 //M: constructMatrix
-tuple<sp_mat,vec> build_matrix (sp_mat A, vec b, mat img2_dx, mat img2_dy, mat img_z,
+tuple<sp_mat,vec> build_matrix (mat img2_dx, mat img2_dy, mat img_z,
 		mat dxx, mat dxy, mat dyy, mat dxz, mat dyz, mat e_data,
 		mat e_smooth, mat u, mat v, double gamma){
 	cout<<"In build_matrix"<<endl;
+	sp_mat A;
+	vec b;
 	uword height = u.n_rows;
 	uword width = u.n_cols;
 
@@ -374,23 +375,9 @@ mat tmp5 =tmp1;
 
 	}
 
-/*	if(cols(0) > 0 || cols(5) > 0){
-		cout<<"false positive cols(0)"<<cols(0)<<endl;
-		cout<<"false positive cols(5)"<<cols(5)<<endl;
-	}else{
-		cout<<"pass"<<endl;
-		cout<<" positive cols(0)"<<cols(0)<<endl;
-		cout<<" positive cols(5)"<<cols(5)<<endl;
-	}*/
-
-
 	//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
 	//M:A = sparse (rows,cols,vals) ;
 
-
-	//rows.save("mats/test_matrix_builder/OutputsV2/rowsv5-c", raw_ascii);
-    //cols.save("mats/test_matrix_builder/OutputsV2/colsv5-c", raw_ascii);
-	//vals.save("mats/test_matrix_builder/OutputsV2/valsv2-c", raw_ascii);
 	//---------------Create Square Matrix-------------------------------------------
 	cout<<" SIZE OF COLS"<<cols.n_cols<<endl;
 	cout<<" MAX OF COL S"<<max(cols)<<endl;
