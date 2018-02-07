@@ -15,6 +15,50 @@ using namespace std;
 using namespace arma;
 void init_variables();
 
+<<<<<<< HEAD
+    sp_mat A;//inspect matlab code, see if these are edited
+	vec b;
+	mat img2_dx;
+	mat img2_dy;
+	mat img_z;
+	mat dxx; // was experiencing data loss with umat, not with mat
+	mat dxy;
+	mat dyy;
+	mat dxz;
+	mat dyz;
+    mat e_data;
+	mat e_smooth;
+	mat u;
+	mat v;
+	double gam;
+
+
+int main() {
+
+	//img_vert_warp.save("mats/HorizontalBar/img_vert_warpmyFile",raw_ascii);
+	 /* Currently my plan is to produce these myFiles in matlab at various points
+	 * in that program, starting at the end and comparing them to the corresponding
+	 * outputs in the matrix_builder program also. If there are discreprencies, then
+	 * the program will be cut in half and the first half of the program will be
+	 * checked an so on. The notes for this portion of the lab should be very
+	 * robust.  */
+	init_variables();
+	mat smallA;
+	//get size of img_vert_warp data structure and print to screen
+
+
+	tie(A,b) = build_matrix( A, b,img2_dx,img2_dy,img_z,dxx, dxy, dyy, dxz, dyz, e_data,e_smooth, u, v, gam);
+	//b produces exact information. 22/jan/18 NO EDITS TO B
+	//b.save("mats/test_matrix_builder/Outputs/b-c", raw_ascii);
+	//A.save("mats/test_matrix_builder/Outputs/A_sp-c", raw_ascii);
+
+	//uword height = A.n_rows;
+	//uword width  = A.n_cols;
+	//cout<<"height"<< height << "   width"<< width<<endl;
+	//smallA = A.submat(0,0,99,99);
+	//smallA.save("mats/test_matrix_builder/Outputs/smallA-c", raw_ascii);
+	//create print of what A's dimensions are
+=======
     mat A;//inspect matlab code, see if these are edited
 	vec b;
 	mat img2_dx;
@@ -42,30 +86,13 @@ int main() {
 	 * checked an so on. The notes for this portion of the lab should be very
 	 * robust.  */
 	init_variables();
-<<<<<<< HEAD
 
 	//get size of img_vert_warp data structure and print to screen
 
 
 	tie(A,b) = build_matrix( A, b,img2_dx,img2_dy,img_z,dxx, dxy, dyy, dxz, dyz, e_data,e_smooth, u, v, gam);
 
-=======
-	mat smallA;
-	//get size of img_vert_warp data structure and print to screen
-
-
-	tie(A,b) = build_matrix( A, b,img2_dx,img2_dy,img_z,dxx, dxy, dyy, dxz, dyz, e_data,e_smooth, u, v, gam);
-	//b produces exact information. 22/jan/18 NO EDITS TO B
-	//b.save("mats/test_matrix_builder/Outputs/b-c", raw_ascii);
-	//A.save("mats/test_matrix_builder/Outputs/A_sp-c", raw_ascii);
-
-	//uword height = A.n_rows;
-	//uword width  = A.n_cols;
-	//cout<<"height"<< height << "   width"<< width<<endl;
-	//smallA = A.submat(0,0,99,99);
-	//smallA.save("mats/test_matrix_builder/Outputs/smallA-c", raw_ascii);
-	//create print of what A's dimensions are
->>>>>>> refs/remotes/origin/james
+>>>>>>> refs/heads/jake
 	return 0;
 }
 
