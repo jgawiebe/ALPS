@@ -22,15 +22,15 @@ using namespace cv;
 //M: optic_flow_brox
 int main() {
 	//set constants
-	const double num_levels = 3.0, alpha = 30.0, gamma = 80.0, omega = 1.8;
-	const int outer_iter = 3, inner_iter = 3;
+	const double num_levels = 10.0, alpha = 10.0, gamma = 80.0, omega = 1.8;
+	const int outer_iter = 1, inner_iter = 50;
 	
 	//set intial scale factor
 	double scale_factor = pow(0.95, num_levels);
 	
 	//initialize input matrices
-	mat image1 = to_arma(imread("car0.png", CV_LOAD_IMAGE_GRAYSCALE));
-	mat image2 = to_arma(imread("car1.png", CV_LOAD_IMAGE_GRAYSCALE));
+	mat image1 = to_arma(imread("cars1.png", CV_LOAD_IMAGE_GRAYSCALE));
+	mat image2 = to_arma(imread("cars2.png", CV_LOAD_IMAGE_GRAYSCALE));
 
 	//FOR TESTING MEMORY ERROR
 	image1 = image1.submat(0, 0, 60, 60);
@@ -98,11 +98,11 @@ int main() {
 
 
 		//compare with u-m, v-m
-		u.save("mats/fin/u-c.txt");
-		v.save("mats/fin/v-c.txt");
+		u.save("mats/fin/u-c.txt", raw_ascii);
+		v.save("mats/fin/v-c.txt", raw_ascii);
 
-		img1.save("mats/main/img1-output.txt");
-		img2.save("mats/main/img2-output.txt");
+		img1.save("mats/main/img1-output.txt", raw_ascii);
+		img2.save("mats/main/img2-output.txt", raw_ascii);
 
 		cout << "--------" << i + 1 << "/" << num_levels << " levels of guassian pyramid complete--------\n\n";
 	}

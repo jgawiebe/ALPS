@@ -13,9 +13,6 @@ using namespace arma;
 
 //M: gaussDeriv
 tuple<mat, mat> gradient(mat I) {
-
-	printf("Generating gradient of a %u by %u matrix...", I.n_rows, I.n_cols);
-
 	//int sigma = 1;
   int limit = 1000;
 	//int variance = 1;

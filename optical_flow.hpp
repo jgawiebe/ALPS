@@ -46,7 +46,8 @@ tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
 		mat u, mat v, int outer_iter, int inner_iter) {
 	cout << "Running optical flow procedure >"<< endl;
 	bool fail_flag = false;
-	double tolerance = 1e-8;
+	//double tolerance = 1e-8;
+	double tolerance = 0.7;
 
 	mat dxx, dxy;
 	mat dyx, dyy;
@@ -83,7 +84,7 @@ tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
 		tie(A, duv) = build_matrix(img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (alpha * e_smooth), u, v, gamma);
 
 		//TESTING
-		duv.save("mats/fin/b-built.txt");
+		duv.save("b-built.txt", raw_ascii);
 
 		//img2_dx.clear();
 		//e_smooth.clear();
@@ -115,6 +116,8 @@ tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
 	cout << "> Optical flow complete" << endl;
 	if (fail_flag) {
 		cout << "ALGORTIHM COMPLETE: FAILURE\nPress any key to exit" << endl;
+		u.save("mats/fin/u-c.txt", raw_ascii);
+		v.save("mats/fin/v-c.txt", raw_ascii);
 		cin.get();
 		exit(EXIT_FAILURE);
 	}

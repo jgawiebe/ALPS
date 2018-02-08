@@ -46,16 +46,11 @@ tuple<vec, uword> successive_overrelaxation(sp_mat A,
 
 	//M, N are outputs; b is an inout
 	tie(M, N, b) = split(M, N, b, A, omega);
-	cout << " done" << endl;
+	
 	//b.save("mats/test_SOR/Outputs/bPostSplit-c", raw_ascii);
 	mat approx;
-	//mat tmpM;
-
-
-	//CAN'T MAKE MAT FROM SPARSE MAT (TOO MUCH MEMORY USAGE)
 	
 	mat tmpM = (mat)M;
-	cout << "FIX" << endl;
 
 	//continue to perform approximations until max iterations or accuracy is below the tolerance level
 	for (uword i = 0; i < inner_iter; i++) {
@@ -107,6 +102,8 @@ tuple<sp_mat, sp_mat, vec> split(sp_mat M, sp_mat N, vec b, sp_mat A,
 	b *= omega;
 	M = (omega * lwrDiagA) + diagA; // -1 parameter
 	N = (-omega * uprDiagA) + ((1 - omega) * diagA); //1 parameter
+
+	cout << " done" << endl;
 
 	return make_tuple(M, N, b);
 }
