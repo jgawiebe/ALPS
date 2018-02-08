@@ -82,7 +82,7 @@ mat generate_esmooth(mat u, mat v) {
 	uword y = 0;
 	uword x = 0;
 
-	cout << "    Building matrix..." << endl;
+	cout << "Building matrix...";
 	for (uword row = 1; row < e_smooth.n_rows; row += 2) {
 		for (uword col = 1; col < e_smooth.n_cols; col += 2) {
 

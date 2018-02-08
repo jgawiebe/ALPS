@@ -47,7 +47,7 @@ int main() {
 
 	init_variables();
 
-	tie(A,b) = build_matrix( A, b,img2_dx,img2_dy,img_z,dxx, dxy, dyy, dxz, dyz, e_data,e_smooth, u, v, gam);
+	tie(A, duv) = build_matrix(img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (30.0 * e_smooth), u, v, gam);
 	 cout<<"Out of build_matrix in test main()"<<endl;
 	//build_matrix produces good info for A and b
 
@@ -55,7 +55,7 @@ int main() {
 	//note A is a dense matrix at this point of 3 columns which needs to be converted into a
 	//square sparse matrix.
 
-    tie(duv, failure) = successive_overrelaxation(duv, failure, A,b,omega, max_it,tol );
+	 tie(duv, failure) = successive_overrelaxation(A, duv, omega, max_it, tol);
     cout<<"Out of successive_overrelaxation in test main()"<<endl;
 
 	duv.save("mats/test_SOR/Outputs/duv-c", raw_ascii);

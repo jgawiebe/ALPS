@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <armadillo>
+
 #include "gradient.hpp"
 #include "energy_calc.hpp"
 #include "matrix_builder.hpp"
@@ -56,7 +57,9 @@ tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
 	uword ht = img_z.n_rows;
 	uword wt = img_z.n_cols;
 
-	vec duv(ht*wt*2, fill::zeros);
+	vec duv(ht*wt *2, fill::zeros);
+
+	sp_mat A;
 
 	cout << "Calculating second derivatives" << endl;
 	//get second derivatives of img2_dx
@@ -76,15 +79,28 @@ tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
 
 		e_smooth = generate_esmooth(u + du, v + dv);
 
-		cout << "Building matrix..." << endl;
-		//tie(A, b) = build_matrix(img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (alpha * e_smooth), u, v, gamma);
+		
+		tie(A, duv) = build_matrix(img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (alpha * e_smooth), u, v, gamma);
 
-		cout << "Performing successive-overrelaxation..." << endl;
-//		duv = successive_overrelaxation(&fail_flag, A, duv, b, omega,
-//				inner_iter, tolerance);
+		//TESTING
+		duv.save("mats/fin/b-built.txt");
+
+		//img2_dx.clear();
+		//e_smooth.clear();
+		//img2_dy.clear();
+		//img_z.clear();
+		//	dxx.clear(); 
+		//	dxy.clear();
+		//	dyy.clear();
+		//	dxz.clear();
+		//	dyz.clear();
+		//	e_data.clear();
+
+
+		tie(duv, fail_flag) = successive_overrelaxation(A, duv, omega, inner_iter, tolerance);
 
 		if (fail_flag) {
-			cout << "Successive-overrelaxation failed to reach convergence. Retrying." << endl;
+			cout << "> Successive-overrelaxation failed to reach convergence -> Retrying\n\n" << endl;
 			continue; //did not reach convergence, must try again
 		}
 
@@ -97,5 +113,10 @@ tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
 		}
 	}
 	cout << "> Optical flow complete" << endl;
+	if (fail_flag) {
+		cout << "ALGORTIHM COMPLETE: FAILURE\nPress any key to exit" << endl;
+		cin.get();
+		exit(EXIT_FAILURE);
+	}
 	return make_tuple(u, v, du, dv);
 }

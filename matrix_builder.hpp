@@ -19,7 +19,8 @@ using namespace arma;
 tuple<sp_mat, vec> build_matrix(mat img2_dx, mat img2_dy, mat img_z,
 	mat dxx, mat dxy, mat dyy, mat dxz, mat dyz, mat e_data,
 	mat e_smooth, mat u, mat v, double gamma) {
-	cout << "In build_matrix" << endl;
+	
+	cout << "Building matrix >" << endl;
 	sp_mat A;
 	vec b;
 	uword height = u.n_rows;
@@ -63,6 +64,8 @@ tuple<sp_mat, vec> build_matrix(mat img2_dx, mat img2_dy, mat img_z,
 	//MatLab is 1 indexed and C++ is 0 indexed. So thats why i in the
 	//loop is 1 less than in the Matlab comment.
 	//M:cols(1:6:end) = rows(1:6:end) - 2 * ht ;	% x-1
+
+	cout << "Populating columns vector" << endl;
 	for (uword i = 0; i<temp4repmat; i = i + 6) {
 		cols(i) = rows(i) - (2 * height);
 	}
@@ -109,6 +112,7 @@ tuple<sp_mat, vec> build_matrix(mat img2_dx, mat img2_dy, mat img_z,
 	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS> DONE
 	uword ik = 0;
 	uword jk = 0;
+	cout << "Populating e_sum matrix" << endl;
 	for (uword i = 2; i<e_height; i = i + 2) {
 		for (uword j = 2; j<e_width; j = j + 2) {
 			if (i < (2 * height)) {//ht good
@@ -398,5 +402,7 @@ tuple<sp_mat, vec> build_matrix(mat img2_dx, mat img2_dy, mat img_z,
 	A = C1;
 	cout << " SIZE OF A  " << A.n_cols << endl;
 	//end Jan 17 - just need to do pdfaltsumv's > Done morning of 19th.
+
+	cout << "> Sparse matrix built" << endl;
 	return make_tuple(A, b);
 }

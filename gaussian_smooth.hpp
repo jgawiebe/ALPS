@@ -11,7 +11,6 @@ Rev2: Feb 2018 TESTING PASSED
 using namespace std;
 using namespace arma;
 
-
 //M: guassianSmooth
 mat g_smooth (mat img, double scale){
 	//int sigma = 1;

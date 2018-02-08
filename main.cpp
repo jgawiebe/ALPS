@@ -22,8 +22,8 @@ using namespace cv;
 //M: optic_flow_brox
 int main() {
 	//set constants
-	const double alpha = 30.0, gamma = 80.0, omega = 1.8;
-	const int num_levels = 2, outer_iter = 3, inner_iter = 5;
+	const double num_levels = 3.0, alpha = 30.0, gamma = 80.0, omega = 1.8;
+	const int outer_iter = 3, inner_iter = 3;
 	
 	//set intial scale factor
 	double scale_factor = pow(0.95, num_levels);
@@ -31,6 +31,12 @@ int main() {
 	//initialize input matrices
 	mat image1 = to_arma(imread("car0.png", CV_LOAD_IMAGE_GRAYSCALE));
 	mat image2 = to_arma(imread("car1.png", CV_LOAD_IMAGE_GRAYSCALE));
+
+	//FOR TESTING MEMORY ERROR
+	image1 = image1.submat(0, 0, 60, 60);
+	image2 = image2.submat(0, 0, 60, 60);
+
+
 
 	if (image1.n_elem == 0 || image2.n_elem == 0) {
 		cout << "error: images could not be opened" << endl;
@@ -54,6 +60,9 @@ int main() {
 	//perform guassian scaling on images
 	mat img1 = g_smooth(image1, scale_factor);
 	mat img2 = g_smooth(image2, scale_factor);
+
+	img1 = bilinear_resize(img1, img1*scale_factor);
+	img2 = bilinear_resize(img2, img2*scale_factor);
 
 	//define u and v matrices
 	mat u(img1.n_rows, img1.n_cols, fill::zeros);
@@ -80,24 +89,25 @@ int main() {
 		v = v + dv;
 		
 		//scale original images to next level of the pyramid
-		img1 = g_smooth(image1, scale_factor);
+ 		img1 = g_smooth(image1, scale_factor);
 		img2 = g_smooth(image2, scale_factor);
 
 		//resize to current resolution
-		bilinear_resize(u, img1);
-		bilinear_resize(v, img1);
+		u = bilinear_resize(u, img1);
+		v = bilinear_resize(v, img1);
 
 
 		//compare with u-m, v-m
-		u.save("mats/energy/u-c.txt");
-		v.save("mats/energy/v-c.txt");
+		u.save("mats/fin/u-c.txt");
+		v.save("mats/fin/v-c.txt");
 
 		img1.save("mats/main/img1-output.txt");
 		img2.save("mats/main/img2-output.txt");
 
-		printf("%d / %d levels of guassian pyramid complete", i + 1, num_levels);
+		cout << "--------" << i + 1 << "/" << num_levels << " levels of guassian pyramid complete--------\n\n";
 	}
-
-	return 0;
+	cout << "ALGORTIHM COMPLETE: SUCCESS\nPress any key to exit" << endl;
+	cin.get();
+	exit(EXIT_SUCCESS);
 }
 
