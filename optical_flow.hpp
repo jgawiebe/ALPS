@@ -47,7 +47,7 @@ tuple<mat, mat, mat, mat> optical_flow(double alpha, double gamma, double omega,
 	cout << "Running optical flow procedure >"<< endl;
 	bool fail_flag = false;
 	//double tolerance = 1e-8;
-	double tolerance = 0.7;
+	double tolerance = 0.5;
 
 	mat dxx, dxy;
 	mat dyx, dyy;

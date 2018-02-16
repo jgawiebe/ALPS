@@ -45,6 +45,7 @@ tuple<vec, uword> successive_overrelaxation(sp_mat A,
 	//Had to make an sp_mat for this to work...
 
 	//M, N are outputs; b is an inout
+	cout << A;
 	tie(M, N, b) = split(M, N, b, A, omega);
 	
 	//b.save("mats/test_SOR/Outputs/bPostSplit-c", raw_ascii);

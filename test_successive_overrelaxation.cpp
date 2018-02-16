@@ -46,9 +46,11 @@ int main() {
 	//Creat new input vectors for test_SOR Then carry on
 
 	init_variables();
+	cout << "CHECK IMAGE READINGS" << endl;
 
-	tie(A, duv) = build_matrix(img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (30.0 * e_smooth), u, v, gam);
+	tie(A, duv) = build_matrix(img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (10.0 * e_smooth), u, v, gam);
 	 cout<<"Out of build_matrix in test main()"<<endl;
+	 cin.get();
 	//build_matrix produces good info for A and b
 
 	//0's columns on A trimmed, ready for input to SOR
@@ -57,8 +59,9 @@ int main() {
 
 	 tie(duv, failure) = successive_overrelaxation(A, duv, omega, max_it, tol);
     cout<<"Out of successive_overrelaxation in test main()"<<endl;
+	cin.get();
 
-	duv.save("mats/test_SOR/Outputs/duv-c", raw_ascii);
+	duv.save("duv-c.txt", raw_ascii);
 	//b.save("mats/test_matrix_builder/OutputsV2/bv2-c", raw_ascii);
 	//A.save("mats/test_matrix_builder/OutputsV2/Av2-c", raw_ascii);
 
@@ -88,24 +91,26 @@ int main() {
 
 void init_variables(){
 	//variables loaded in for matrix_builder
-	img2_dx.load("mats/test_matrix_builder/Inputsv2/IkxV2.txt");
-	img2_dy.load("mats/test_matrix_builder/Inputsv2/IkyV2.txt");
-	img_z.load("mats/test_matrix_builder/Inputsv2/IkzV2.txt");
-	dxx.load("mats/test_matrix_builder/Inputsv2/IxxV2.txt");
-	dxy.load("mats/test_matrix_builder/Inputsv2/IxyV2.txt");
-	dyy.load("mats/test_matrix_builder/Inputsv2/IyyV2.txt");
-	dxz.load("mats/test_matrix_builder/Inputsv2/IxzV2.txt");
-    dyz.load("mats/test_matrix_builder/Inputsv2/IyzV2.txt");
-	e_data.load("mats/test_matrix_builder/Inputsv2/E_DataV2.txt");
-	e_smooth.load("mats/test_matrix_builder/Inputsv2/aE_smoothV2.txt");
-	u.load("mats/test_matrix_builder/Inputsv2/uV2.txt");
-	v.load("mats/test_matrix_builder/Inputsv2/vV2.txt");
+	img2_dx.load("mats/SmallHori/IkxHoriSmall.txt");
+	img2_dy.load("mats/SmallHori/IkyHoriSmall.txt");
+	img_z.load("mats/SmallHori/IkzHoriSmall.txt");
+	dxx.load("mats/SmallHori/IxxHoriSmall.txt");
+	dxy.load("mats/SmallHori/IxyHoriSmall.txt");
+	dyy.load("mats/SmallHori/IyyHoriSmall.txt");
+	dxz.load("mats/SmallHori/IxzHoriSmall.txt");
+    dyz.load("mats/SmallHori/IyzHoriSmall.txt");
+	e_data.load("mats/SmallHori/E_DataHoriSmall.txt");
+	e_smooth.load("mats/SmallHori/aE_smoothHoriSmall.txt");
+	u.load("mats/SmallHori/uHoriSmall.txt");
+	v.load("mats/SmallHori/vHoriSmall.txt");
     gam = 80; //value stored in gamma.txt
 
     //variables loaded in for successive_overrelaxation.
     omega = 1.8;
-    max_it = 500;
-	tol = 1*(10^(-8));
+    //max_it = 500;
+	//tol = 1*(10^(-8));
+	max_it = 50;
+	tol = 1e-8;
 	failure = 0;
 
 }

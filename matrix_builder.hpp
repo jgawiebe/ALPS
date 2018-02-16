@@ -2,7 +2,6 @@
 energy_calc.hpp
 Jacob Wiebe & James Dolman
 Rev1: Nov 2017
-Rev2: Feb 2018 TESTING PASSED
 */
 
 #include <iostream>
@@ -19,8 +18,7 @@ using namespace arma;
 tuple<sp_mat, vec> build_matrix(mat img2_dx, mat img2_dy, mat img_z,
 	mat dxx, mat dxy, mat dyy, mat dxz, mat dyz, mat e_data,
 	mat e_smooth, mat u, mat v, double gamma) {
-	
-	cout << "Building matrix >" << endl;
+	cout << "In build_matrix" << endl;
 	sp_mat A;
 	vec b;
 	uword height = u.n_rows;
@@ -64,8 +62,6 @@ tuple<sp_mat, vec> build_matrix(mat img2_dx, mat img2_dy, mat img_z,
 	//MatLab is 1 indexed and C++ is 0 indexed. So thats why i in the
 	//loop is 1 less than in the Matlab comment.
 	//M:cols(1:6:end) = rows(1:6:end) - 2 * ht ;	% x-1
-
-	cout << "Populating columns vector" << endl;
 	for (uword i = 0; i<temp4repmat; i = i + 6) {
 		cols(i) = rows(i) - (2 * height);
 	}
@@ -112,7 +108,6 @@ tuple<sp_mat, vec> build_matrix(mat img2_dx, mat img2_dy, mat img_z,
 	//NOTE MAY HAVE TO REVISE THE IF STATEMENTS TO MAKE THEM HAVE 3 IF STATEMENTS> DONE
 	uword ik = 0;
 	uword jk = 0;
-	cout << "Populating e_sum matrix" << endl;
 	for (uword i = 2; i<e_height; i = i + 2) {
 		for (uword j = 2; j<e_width; j = j + 2) {
 			if (i < (2 * height)) {//ht good
@@ -387,9 +382,23 @@ tuple<sp_mat, vec> build_matrix(mat img2_dx, mat img2_dy, mat img_z,
 
 	}
 
+	/*	if(cols(0) > 0 || cols(5) > 0){
+	cout<<"false positive cols(0)"<<cols(0)<<endl;
+	cout<<"false positive cols(5)"<<cols(5)<<endl;
+	}else{
+	cout<<"pass"<<endl;
+	cout<<" positive cols(0)"<<cols(0)<<endl;
+	cout<<" positive cols(5)"<<cols(5)<<endl;
+	}*/
+
+
 	//cols.save("mats/test_matrix_builder/Outputs/cols-c", raw_ascii);
 	//M:A = sparse (rows,cols,vals) ;
 
+	//Pass for .bmp image horizontal. DON'T TOUCH 12 Feb 2018
+	//rows.save("mats/test_matrix_builder/OuptusCheck/rows-c", raw_ascii);
+	//cols.save("mats/test_matrix_builder/OuptusCheck/cols-c", raw_ascii);
+	vals.save("vals-c", raw_ascii);
 	//---------------Create Square Matrix-------------------------------------------
 	cout << " SIZE OF COLS" << cols.n_cols << endl;
 	cout << " MAX OF COL S" << max(cols) << endl;
@@ -402,7 +411,5 @@ tuple<sp_mat, vec> build_matrix(mat img2_dx, mat img2_dy, mat img_z,
 	A = C1;
 	cout << " SIZE OF A  " << A.n_cols << endl;
 	//end Jan 17 - just need to do pdfaltsumv's > Done morning of 19th.
-
-	cout << "> Sparse matrix built" << endl;
 	return make_tuple(A, b);
 }

@@ -58,3 +58,6 @@ test
 *.png
 *.dll
 /enc_temp_folder/aaff9ce55275974bf1979794ffb0393f
+*.txt
+/images
+*.pdb

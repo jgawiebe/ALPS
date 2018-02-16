@@ -42,7 +42,5 @@ tuple<mat, mat> gradient(mat I) {
 	x_deriv = conv2(I, derivative.t(), "same");
 	y_deriv = conv2(I, derivative, "same");
 
-	cout << " done" << endl;
-
 	return make_tuple(x_deriv, y_deriv);
 }

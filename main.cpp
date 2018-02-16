@@ -33,8 +33,8 @@ int main() {
 	mat image2 = to_arma(imread("cars2.png", CV_LOAD_IMAGE_GRAYSCALE));
 
 	//FOR TESTING MEMORY ERROR
-	image1 = image1.submat(0, 0, 60, 60);
-	image2 = image2.submat(0, 0, 60, 60);
+	image1 = image1.submat(0, 0, 10, 10);
+	image2 = image2.submat(0, 0, 10, 10);
 
 
 
@@ -98,7 +98,7 @@ int main() {
 
 
 		//compare with u-m, v-m
-		u.save("mats/fin/u-c.txt", raw_ascii);
+		u.save("mats/fin/u-c.txt");
 		v.save("mats/fin/v-c.txt", raw_ascii);
 
 		img1.save("mats/main/img1-output.txt", raw_ascii);
