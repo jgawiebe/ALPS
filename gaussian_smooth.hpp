@@ -7,10 +7,10 @@ Rev2: Feb 2018 TESTING PASSED
 
 #include <iostream>
 #include <armadillo>
+//#include "nvblas.h"
 
 using namespace std;
 using namespace arma;
-
 
 //M: guassianSmooth
 mat g_smooth (mat img, double scale){
@@ -64,18 +64,18 @@ mat g_smooth (mat img, double scale){
 		temp = conv(grid, img.col(i));
 		img_build.insert_cols(i, temp);
 		if(i==0){
-			cout<<"height temp...."<<temp.n_rows<<endl;
+			/*cout<<"height temp...."<<temp.n_rows<<endl;*/
 		}
 	}
-	cout<<"img_build width: "<<img_build.n_cols<<endl;
-	cout<<"img_build hight: "<<img_build.n_rows<<endl;
+	/*cout<<"img_build width: "<<img_build.n_cols<<endl;
+	cout<<"img_build hight: "<<img_build.n_rows<<endl;*/
 	for (uword i = 0; i < img_build.n_rows; i++) {
 		temp = conv(grid, img_build.row(i));
 		temp_r = conv_to<rowvec>::from(temp);
 		smooth_img.insert_rows(i, temp_r);
 	}
-	cout<<"smooth_img width: "<<smooth_img.n_cols<<endl;
-	cout<<"smooth_img hight: "<<smooth_img.n_rows<<endl;
+	/*cout<<"smooth_img width: "<<smooth_img.n_cols<<endl;
+	cout<<"smooth_img hight: "<<smooth_img.n_rows<<endl;*/
 
 
 	//this done to trim the matrix down to old size of img.
@@ -83,8 +83,8 @@ mat g_smooth (mat img, double scale){
 	//needs to be trimmed.
 	uword grid_length = grid.n_rows;
 	smooth_img = smooth_img.submat((grid_length-1)/2,(grid_length-1)/2,(smooth_img.n_rows-1) - ((grid_length)/2),(smooth_img.n_cols-1) - ((grid_length)/2));
-	cout<<"smooth_img after trim width: "<<smooth_img.n_cols<<endl;
-	cout<<"smooth_img after trim hight: "<<smooth_img.n_rows<<endl;
+	/*cout<<"smooth_img after trim width: "<<smooth_img.n_cols<<endl;
+	cout<<"smooth_img after trim hight: "<<smooth_img.n_rows<<endl;*/
 
 return smooth_img;
 }
