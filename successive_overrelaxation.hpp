@@ -45,17 +45,16 @@ tuple<vec, uword> successive_overrelaxation(sp_mat A,
 	//Had to make an sp_mat for this to work...
 
 	//M, N are outputs; b is an inout
-	cout << A;
+	
 	tie(M, N, b) = split(M, N, b, A, omega);
 	
-	//b.save("mats/test_SOR/Outputs/bPostSplit-c", raw_ascii);
 	mat approx;
-	
 	mat tmpM = (mat)M;
+	vec x_initial = x;
 
 	//continue to perform approximations until max iterations or accuracy is below the tolerance level
 	for (uword i = 0; i < inner_iter; i++) {
-		vec x_initial = x;
+	    x_initial = x;
 		cout << "Making approximation... ";
 		approx = (N * x) + b;
 		cout << " done" << endl;
@@ -80,7 +79,8 @@ tuple<vec, uword> successive_overrelaxation(sp_mat A,
 		failure = true; //convergence not found set failure to true
 	}
 	else {
-		cout << "> Solution vector determined" << endl;
+		cout << "Convergence reached" << endl;
+		failure = false;
 	}
 	return make_tuple(x, failure); //solution vector (duv)
 }

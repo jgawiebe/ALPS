@@ -19,6 +19,8 @@ void init_variables();
 	//variables for matrix_builder
     sp_mat A;//inspect matlab code, see if these are edited
 	vec b;
+	frowvec row, col;
+	vec val;
 	mat img2_dx;
 	mat img2_dy;
 	mat img_z;
@@ -38,7 +40,13 @@ void init_variables();
 	double max_it;
 	double tol;
 	vec duv;
-	uword failure;
+	//bool* failure;
+
+	unsigned int n, x_size;
+	const unsigned int max_iter = 500;
+
+	double* parallel_sor(double *val, float *row, float *col, double *b, const unsigned int n, const unsigned int x_size, const unsigned int max_iter, double tol);
+	extern double* serial_sor(double *val, float *row, float *col, double *b, const unsigned int n, const unsigned int x_size, const unsigned int max_iter);
 
 
 int main() {
@@ -46,24 +54,40 @@ int main() {
 	//Creat new input vectors for test_SOR Then carry on
 
 	init_variables();
-	cout << "CHECK IMAGE READINGS" << endl;
 
-	tie(A, duv) = build_matrix(img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, (10.0 * e_smooth), u, v, gam);
-	 cout<<"Out of build_matrix in test main()"<<endl;
-	 cin.get();
-	//build_matrix produces good info for A and b
+	tie(row, col, val, b) = build_matrix(img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, e_smooth, u, v, gam);
+	cout << "Out of build_matrix" << endl;
 
-	//0's columns on A trimmed, ready for input to SOR
-	//note A is a dense matrix at this point of 3 columns which needs to be converted into a
-	//square sparse matrix.
+	n = (int)val.n_elem;
+	x_size = (int)b.n_elem;
 
-	 tie(duv, failure) = successive_overrelaxation(A, duv, omega, max_it, tol);
-    cout<<"Out of successive_overrelaxation in test main()"<<endl;
+	cout << n << endl;
+	//cout << row << endl;
+	//tie(A, duv) = build_sparse(img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, e_smooth, u, v, gam);
+	//cout << "Out of build_sparse" << endl;
+	//cin.get();
+
+	//double* x = serial_sor(val.memptr(), row.memptr(), col.memptr(), b.memptr(), n, x_size, max_iter);
+	double* x = parallel_sor(val.memptr(), row.memptr(), col.memptr(), b.memptr(), n, x_size, max_iter, tol);
+	cout << "Out of cuda - hit enter to save duv" << endl;
+	//cout << "Fail: " << *failure << endl;
+	
+	vec duv(x, x_size); //may want to try the other parameters
 	cin.get();
+	duv.save("duv_cuda-c.txt", raw_ascii);
 
-	duv.save("duv-c.txt", raw_ascii);
-	//b.save("mats/test_matrix_builder/OutputsV2/bv2-c", raw_ascii);
-	//A.save("mats/test_matrix_builder/OutputsV2/Av2-c", raw_ascii);
+
+	//tie(A, duv) = build_sparse(img2_dx, img2_dy, img_z, dxx, dxy, dyy, dxz, dyz, e_data, e_smooth  , u, v, gam);
+	//cout<<"Out of build_sparse"<<endl;
+	////cin.get();
+
+	//tie(duv, failure) = successive_overrelaxation(A, duv, omega, max_it, tol);
+ //   cout<<"Out of successive_overrelaxation in test main() - hit enter to save duv"<<endl;
+	//cout << "Fail: "<<failure; 
+	//cin.get();
+	//duv.save("duv_serial-c.txt", raw_ascii);
+
+	
 
 	return 0;
 }
@@ -109,8 +133,8 @@ void init_variables(){
     omega = 1.8;
     //max_it = 500;
 	//tol = 1*(10^(-8));
-	max_it = 50;
+	max_it = 500;
 	tol = 1e-8;
-	failure = 0;
+	//*failure = true;
 
 }
