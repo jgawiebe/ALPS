@@ -26,7 +26,7 @@ int main() {
 	double scale_factor = pow(0.95, num_levels);
 
 	//initialize input matrices
-	//mat image1 = to_arma(imread("cars1.png", CV_LOAD_IMAGE_GRAYSCALE));
+	mat image1 = to_arma(imread("cars1.png", CV_LOAD_IMAGE_GRAYSCALE));
 	//mat image2 = to_arma(imread("cars2.png", CV_LOAD_IMAGE_GRAYSCALE));
 
 	mat image1, image2;
