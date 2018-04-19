@@ -16,7 +16,7 @@ using namespace arma;
 tuple<sp_mat, vec> build_sparse(mat img2_dx, mat img2_dy, mat img_z,
 	mat dxx, mat dxy, mat dyy, mat dxz, mat dyz, mat e_data,
 	mat e_smooth, mat u, mat v, double gamma) {
-	cout << "In build_matrix" << endl;
+	//cout << "In build_matrix" << endl;
 	sp_mat A;
 	vec b;
 	uword height = u.n_rows;

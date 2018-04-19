@@ -15,6 +15,7 @@ mat psi_function(mat x) {
 	//tested on Jan 30 works
 	//M: psiDerivative
 	const double epsilon = 0.001;
+
 	x = 1 / ((2 * (sqrt(x + epsilon))));
 
 	return x;
@@ -27,7 +28,7 @@ mat generate_esmooth(mat u, mat v) {
 
 	mat e_smooth(2 * height + 1, 2 * width + 1, fill::zeros);
 
-	cout << "Generating E_smooth >" << endl;
+	//cout << "Generating E_smooth >" << endl;
 	//mat e_temp(e_smooth);
 
 	mat temp(1, 2), tr_temp(1, 2); //transposition of temp matrix
@@ -82,7 +83,7 @@ mat generate_esmooth(mat u, mat v) {
 	uword y = 0;
 	uword x = 0;
 
-	cout << "Building matrix >";
+	//cout << "Building matrix >";
 	for (uword row = 1; row < e_smooth.n_rows; row += 2) {
 		for (uword col = 1; col < e_smooth.n_cols; col += 2) {
 

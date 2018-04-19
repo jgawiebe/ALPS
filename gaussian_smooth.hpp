@@ -17,7 +17,7 @@ mat g_smooth (mat img, double scale){
 	//int sigma = 1;
 	int mask_size = 100;
 	float thresh = 1e-3; //THIS IS CORRECT
-
+	
 	double scale_factor = (1 / scale);
 
 	uvec limit;

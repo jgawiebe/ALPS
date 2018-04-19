@@ -21,13 +21,14 @@ tuple<vec, uword> successive_overrelaxation(sp_mat A,
 		  inner_iter   INTEGER maximum number of iterations
 		  tolerance    REAL error tolerance */
 
-	cout << "Performing successive-overrelaxation >" << endl;
+	//cout << "Performing successive-overrelaxation >" << endl;
 
 	sp_mat M, N; //temp variables for matrix splittingw
-	vec error;
+	double error;
 	vec x(b.n_rows, fill::zeros);
 
-	bool failure = 0; //init fail to false
+	int failure = 0; //init fail to false
+	int* fail = &failure;
 
 	double norml = norm(b);
 	if (norml == 0) {
@@ -37,9 +38,9 @@ tuple<vec, uword> successive_overrelaxation(sp_mat A,
 	vec r(b);
 	//note: error is always 1 as norml = norm(b) and r = b.
 	error = (norm(r) / norml);
-	if (all(error < tolerance)) { //matrix is already within tolerance, done
+	if (error < tolerance) { //matrix is already within tolerance, done
 		mat fail_mat(A.n_rows, A.n_cols, fill::zeros);
-		return make_tuple(x, failure);
+		return make_tuple(x, *fail);
 	}
 	//Need A to be square to be called by split, in sor
 	//Had to make an sp_mat for this to work...
@@ -51,22 +52,18 @@ tuple<vec, uword> successive_overrelaxation(sp_mat A,
 	mat approx;
 	mat tmpM = (mat)M;
 	vec x_initial = x;
-
+	//printf("2SOR iteration - error is: %f\n", error); //ADD THIS BACK IN
 	//continue to perform approximations until max iterations or accuracy is below the tolerance level
+	
 	for (uword i = 0; i < inner_iter; i++) {
+		printf("SOR iteration %d - error is: %1.11f\r", i, error); //ADD THIS BACK IN
 	    x_initial = x;
-		cout << "Making approximation... ";
 		approx = (N * x) + b;
-		cout << " done" << endl;
-		cout << "Solving for x...";
 		x = solve(tmpM, approx);
-		cout << " done" << endl;
 		error = (norm(x - x_initial) / norm(x));
-		if (all(error <= tolerance)) {
+		if (error <= tolerance) {
 			break; //approximation is within tolerance
 		}
-
-		cout << "Iteration " << i << " of " << inner_iter << " complete. Error is: " << error << endl;
 	}
 
 
@@ -75,14 +72,17 @@ tuple<vec, uword> successive_overrelaxation(sp_mat A,
 	//b /= omega;
 	//r = b - (A * x);
 
-	if (any(error > tolerance)) {
-		failure = true; //convergence not found set failure to true
+	if (error > tolerance) {
+		failure = 1; //convergence not found set failure to true
 	}
 	else {
+		cout << "                                               " << endl;
 		cout << "Convergence reached" << endl;
-		failure = false;
+		
+		failure = 0;
 	}
-	return make_tuple(x, failure); //solution vector (duv)
+
+	return make_tuple(x, *fail); //solution vector (duv)
 }
 
 
@@ -91,7 +91,7 @@ tuple<sp_mat, sp_mat, vec> split(sp_mat M, sp_mat N, vec b, sp_mat A,
 	//omega is the relaxation scalar
 	//double height = A.n_rows;
 	//double width = A.n_cols;
-	cout << "Splitting matrix...";
+	//cout << "Splitting matrix...";
 
 	sp_mat diagA = diagmat(A);
 	sp_mat lwrDiagA = trimatl(A);
@@ -104,7 +104,7 @@ tuple<sp_mat, sp_mat, vec> split(sp_mat M, sp_mat N, vec b, sp_mat A,
 	M = (omega * lwrDiagA) + diagA; // -1 parameter
 	N = (-omega * uprDiagA) + ((1 - omega) * diagA); //1 parameter
 
-	cout << " done" << endl;
+	//cout << " done" << endl;
 
 	return make_tuple(M, N, b);
 }
