@@ -52,8 +52,8 @@ int main(void) {
 	img2 = g_smooth(image2, scale_factor);
 	//EXACT MATCH OF MATLAB
 
-	img1 = bilinear_resize(img1, scale_factor);///////////////////////////////////////////
-	img2 = bilinear_resize(img2, scale_factor);///////////////////////////////////////////
+	img1 = bilinear_resize(img1, scale_factor);
+	img2 = bilinear_resize(img2, scale_factor);
 
 	//IMAGES NEEDED TO BE ROTATED 90 DEGREES, 
 	//NOW I HAVE GOOD DATA FOR FIRST OPTICAL FLOW ATTACK
