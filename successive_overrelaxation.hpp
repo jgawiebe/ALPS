@@ -1,27 +1,24 @@
+//successive_overrelaxation.hpp holds two functions, split() and 
+//successive_overrelation().
+
 #include <iostream>
 #include <armadillo>
 
 using namespace std;
 using namespace arma;
-
+//This function is a service function for successive_overrelaxation(). 
+//It splits up the cooeffient matrix A so that it can be used by the 
+//iterative solver (success_overrelaxation()).
 tuple<sp_mat, sp_mat, vec> split(sp_mat M, sp_mat N, vec b, sp_mat A,
 	double omega);
 
-//M: sor
-//the solution 'x' is the vector 'duv'
-//failure flag can also be used outside this function
+//This function solves a system of linear equations A(x) = b where 
+//the solution is x. The function is an iterative solver where it makes 
+//estimations of x until it reaches its max number of tries or the 
+//error between estimations of x become so small that is is known to have 
+//found the solution. 
 tuple<vec, uword> successive_overrelaxation(sp_mat A,
 	vec b, double omega, uword inner_iter, double tolerance) {
-
-
-	/*	  A            REAL matrix
-		  duv          REAL initial guess vector
-		  b            REAL right hand side vector
-		  omega        REAL relaxation scalar
-		  inner_iter   INTEGER maximum number of iterations
-		  tolerance    REAL error tolerance */
-
-	//cout << "Performing successive-overrelaxation >" << endl;
 
 	sp_mat M, N; //temp variables for matrix splittingw
 	double error;
@@ -36,27 +33,21 @@ tuple<vec, uword> successive_overrelaxation(sp_mat A,
 	}
 
 	vec r(b);
-	//note: error is always 1 as norml = norm(b) and r = b.
 	error = (norm(r) / norml);
 	if (error < tolerance) { //matrix is already within tolerance, done
 		mat fail_mat(A.n_rows, A.n_cols, fill::zeros);
 		return make_tuple(x, *fail);
 	}
-	//Need A to be square to be called by split, in sor
-	//Had to make an sp_mat for this to work...
-
-	//M, N are outputs; b is an inout
 	
 	tie(M, N, b) = split(M, N, b, A, omega);
 	
 	mat approx;
 	mat tmpM = (mat)M;
 	vec x_initial = x;
-	//printf("2SOR iteration - error is: %f\n", error); //ADD THIS BACK IN
-	//continue to perform approximations until max iterations or accuracy is below the tolerance level
 	
+	//continue to perform approximations until max iterations or accuracy is below the tolerance level
 	for (uword i = 0; i < inner_iter; i++) {
-		printf("SOR iteration %d - error is: %1.11f\r", i, error); //ADD THIS BACK IN
+		printf("SOR iteration %d - error is: %1.11f\r", i, error); 
 	    x_initial = x;
 		approx = (N * x) + b;
 		x = solve(tmpM, approx);
@@ -66,19 +57,12 @@ tuple<vec, uword> successive_overrelaxation(sp_mat A,
 		}
 	}
 
-
-	//what does this effect? b & r aren't used anywhere after this
-	//just commenting them out for now
-	//b /= omega;
-	//r = b - (A * x);
-
 	if (error > tolerance) {
 		failure = 1; //convergence not found set failure to true
 	}
 	else {
 		cout << "                                               " << endl;
 		cout << "Convergence reached" << endl;
-		
 		failure = 0;
 	}
 
@@ -88,10 +72,6 @@ tuple<vec, uword> successive_overrelaxation(sp_mat A,
 
 tuple<sp_mat, sp_mat, vec> split(sp_mat M, sp_mat N, vec b, sp_mat A,
 	double omega) {
-	//omega is the relaxation scalar
-	//double height = A.n_rows;
-	//double width = A.n_cols;
-	//cout << "Splitting matrix...";
 
 	sp_mat diagA = diagmat(A);
 	sp_mat lwrDiagA = trimatl(A);
@@ -99,12 +79,9 @@ tuple<sp_mat, sp_mat, vec> split(sp_mat M, sp_mat N, vec b, sp_mat A,
 	lwrDiagA = lwrDiagA - diagA; //diagonal in lwrdiagA removed
 	uprDiagA = uprDiagA - diagA; //diagonal in uprDiagA removed
 
-
 	b *= omega;
-	M = (omega * lwrDiagA) + diagA; // -1 parameter
-	N = (-omega * uprDiagA) + ((1 - omega) * diagA); //1 parameter
-
-	//cout << " done" << endl;
+	M = (omega * lwrDiagA) + diagA; 
+	N = (-omega * uprDiagA) + ((1 - omega) * diagA); 
 
 	return make_tuple(M, N, b);
 }
