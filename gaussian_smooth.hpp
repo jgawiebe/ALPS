@@ -6,7 +6,7 @@
 using namespace std;
 using namespace arma;
 
-//g_smooth() outputs a matrix that has been reduced in resolution
+//This function outputs a matrix that has been reduced in resolution
 //or "smoothed". The inputs are the matrix to be smoothed and the 
 //scale which the matrix is to be smoothed down to. The dimensions 
 //of the matrix do not change after smoothing - simply the resolution. 
