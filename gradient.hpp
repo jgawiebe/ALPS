@@ -1,6 +1,5 @@
 //gradient.hpp holds the function gradient(). 
 
-
 #include <iostream>
 #include <armadillo>
 
