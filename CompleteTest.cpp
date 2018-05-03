@@ -1,3 +1,7 @@
+//CompleteTest.cpp holds the main function the program. This is the top 
+//level of execution and once this file has finished execution then the 
+//program is complete. 
+
 #include <iostream>
 #include <armadillo>
 #include <opencv2/core/core.hpp>
@@ -11,6 +15,15 @@ using namespace std;
 using namespace arma;
 using namespace cv;
 
+//This is the main function of the program. In the main the test images
+//are loaded into the program, then are then converted to greyscale format.
+//After this, the images are decimated (downsampled and shrunk) to the 
+//lowest resolution in the gaussian pyramid. The program then loops through
+//the levels of the gaussian pryramid increasing the resolution and size of 
+//the image with each interation. Inside this loop, the derivatives of the 
+//current resized imgaes are calculated and the optical_flow() function 
+//is called. optical_flow() is a major function with its own looping structure.
+
 int main(void) {
 	//set constants
 	const double num_levels = 15.0, alpha = 30.0, gamma = 80.0, omega = 1.8, sor_tolerance = 1e-8;
@@ -23,8 +36,10 @@ int main(void) {
 	mat image1, image2;
 
 	cout << "ALPS implementation of Brox Algorithm - Jacobi version" << endl;
+	cout << "Press Enter" << endl;
 	cin.get();
-
+	
+	//load in images
 	cv::Mat c1 = imread("ch0.png");
 	cv::cvtColor(c1, c1, cv::COLOR_BGR2GRAY);
 	cv::Mat c2 = imread("ch1.png");
@@ -32,9 +47,6 @@ int main(void) {
 	
 	image1 = to_arma(c1);
 	image2 = to_arma(c2);
-	
-	//PRINT IMAGE 1 AND 2 AND VERIFY LOAD IN CORRECT 
-	//LOAD IN PASS, GREY SCALE VALUES THE SAME  
 
 	if (image1.n_elem == 0 || image2.n_elem == 0) {
 		cout << "error: images could not be opened" << endl;
@@ -50,13 +62,10 @@ int main(void) {
 
 	img1 = g_smooth(image1, scale_factor);
 	img2 = g_smooth(image2, scale_factor);
-	//EXACT MATCH OF MATLAB
 
 	img1 = bilinear_resize(img1, scale_factor);
 	img2 = bilinear_resize(img2, scale_factor);
-
-	//IMAGES NEEDED TO BE ROTATED 90 DEGREES, 
-	//NOW I HAVE GOOD DATA FOR FIRST OPTICAL FLOW ATTACK
+	
 	//define u and v matrices
 	mat u(img1.n_rows, img1.n_cols, fill::zeros);
 	mat v(img1.n_rows, img1.n_cols, fill::zeros);
@@ -71,14 +80,10 @@ int main(void) {
 		
 		//derivatives are stored as optical_flow globals
 		compute_derivatives(img1, img2);
-		//COMPUTE DERIVATIVES PASSES THE CHAIN
-		//perform optical_flow to get du and dv
 		
+		//perform optical_flow to get du and dv
 		tie(u, v, du, dv) = optical_flow(alpha, gamma, omega, sor_tolerance, u, v, outer_iter,
 			inner_iter, parallel_mode);
-		//OPTICAL FLOW PASS FOR A SINGLE LOOP THROUGH, ERROR IS DUE TO 
-		//THE FACT THAT WE DON'T ERROR CHECK RIGHT NOW SO WE DO 500 
-		//ITERATIONS NO MATTER WHAT
 		
 		//add incremental change in x and y domain
 		u = u + du;
@@ -100,12 +105,12 @@ int main(void) {
 	
 	cout << "ALGORTIHM COMPLETE: SUCCESS\nPress any key to exit" << endl;
 
-	//not part of tesing below
+	//save result of execution as a text file.
 	u.save("u-jacobi.dat", raw_ascii);
 	v.save("v-jacobi.dat", raw_ascii);
 
 	cin.get();
-	cout << "Hit Enter to Exit";
+	cout << "Press Enter to Exit";
 	exit(EXIT_SUCCESS); 
 	return 0;
 }
