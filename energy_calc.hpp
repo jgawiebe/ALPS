@@ -1,9 +1,5 @@
-/*
- energy_calc.hpp
- Jacob Wiebe & James Dolman
- Reu1: Nov 2017
- Rev2: Jan 2018
- */
+//energy_calc.hpp holds two functions; psi_function() and
+//generate_esmooth(). 
 
 #include <iostream>
 #include <armadillo>
@@ -11,26 +7,22 @@
 using namespace std;
 using namespace arma;
 
+//This function performs a mathematical computation on an inputted 
+//matrix x. 
 mat psi_function(mat x) {
-	//tested on Jan 30 works
-	//M: psiDerivative
 	const double epsilon = 0.001;
-
 	x = 1 / ((2 * (sqrt(x + epsilon))));
-
 	return x;
 }
 
-//M: computePsidashFS_brox
+//This function generates the variable e_smooth. e_smooth is a matrix
+//of doubles who's dimension and content is dependant on the inputted 
+//u and v matrixes. 
 mat generate_esmooth(mat u, mat v) {
 	double height = u.n_rows;
 	double width = u.n_cols;
 
 	mat e_smooth(2 * height + 1, 2 * width + 1, fill::zeros);
-
-	//cout << "Generating E_smooth >" << endl;
-	//mat e_temp(e_smooth);
-
 	mat temp(1, 2), tr_temp(1, 2); //transposition of temp matrix
 
 	temp(0) = 1;
@@ -46,19 +38,19 @@ mat generate_esmooth(mat u, mat v) {
 	temp(1) = 1;
 	tr_temp = temp.t();
 
-	mat u_dx2 = conv2(u_dx, temp / 2, "same"); //all "valid"
+	mat u_dx2 = conv2(u_dx, temp / 2, "same"); 
 	mat v_dx2 = conv2(v_dx, temp / 2, "same");
 
 	mat u_dy2 = conv2(u_dy, tr_temp / 2, "same");
 	mat v_dy2 = conv2(v_dy, tr_temp / 2, "same");
 
-	mat delta_ux = conv2(u_dy2, (temp / 2));      //t
+	mat delta_ux = conv2(u_dy2, (temp / 2));      
 	delta_ux.shed_row(u_dy2.n_rows - 1);
 	mat u_pdx = pow(u_dx.submat(0, 0, u_dx.n_rows - 1, delta_ux.n_cols - 1), 2)
 		+ pow(delta_ux.submat(0, 0, u_dx.n_rows - 1, delta_ux.n_cols - 1),
 			2);
 
-	mat delta_uy = conv2(u_dx2, tr_temp / 2);     //t
+	mat delta_uy = conv2(u_dx2, tr_temp / 2);     
 	delta_uy.shed_col(u_dx2.n_cols - 1);
 	mat u_pdy = pow(u_dy, 2) + pow(delta_uy, 2);
 
@@ -77,13 +69,9 @@ mat generate_esmooth(mat u, mat v) {
 	mat temp_x = psi_function(u_pdx + v_pdx);
 	mat temp_y = psi_function(u_pdy + v_pdy);
 
-	//	e_smooth( 1:2:end, 2:2:end ) = psiDerivative( uypd + vypd ) ;
-	//	e_smooth( 2:2:end, 1:2:end ) = psiDerivative( uxpd + vxpd ) ;
-
 	uword y = 0;
 	uword x = 0;
 
-	//cout << "Building matrix >";
 	for (uword row = 1; row < e_smooth.n_rows; row += 2) {
 		for (uword col = 1; col < e_smooth.n_cols; col += 2) {
 
