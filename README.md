@@ -9,6 +9,7 @@ The Executables folder holds a series of compiled programs which use variations 
 * **ALPS-JACOBI**: uses the Jacobi method for solving the system of linear equations in series.
 * **PALPS-v1**: uses the Jacobi method in parallel for solving the system of linear eqautions column-wise. In the source code this uses `jacobi_serial_v1`. This is only the solving portion of the program using test_sor.
 * **PALPS-v2**: uses the Jacobi method in parallel for solving the system of linear eqautions row-wise (much more efficient). In the source code this uses `jacobi_serial_v2`. This is only the solving portion of the program using test_sor. NOTE: This is an incomplete version and does not converge.
+
 These files were compiled on Windows 7 for a 64-bit architecture. They require the included libraries to run. The PALPS executables require a CUDA compatible GPU.
 
 ### Project Files
