@@ -15,6 +15,9 @@ These files were compiled on Windows 7 for a 64-bit architecture. They require t
 ### Project Files
 The `project_files` folder contains the settings, libraries and additional files used while writing this program. It was developed using Visual Studio 2017.
 
+### Reading `parrallel_solve.cu`
+There are 4 implementations of the Jacobi method within this file. Two parallel implementations using column-wise and row-wise solving (v1 and v2, respectively), and two corresponding serial functions (named v1 and v2). The current project is in debugging the *parallel v2* using *serial v2* as a refrence.
+
 # NOTES ABOUT STYLE
 All files (apart from CUDA) use the `std` and `arma` namespaces. This implies that *mat* is always an Armadillo-type matrix and OpenCV-type matrices use `cv::Mat`. Sometimes (in the case of the bilinear resize file) `arma::mat` is used for additional clarity.
 
