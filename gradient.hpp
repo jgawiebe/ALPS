@@ -1,9 +1,5 @@
-/*
-gradient.hpp
-Jacob Wiebe & James Dolman
-Rev1: Nov 2017
- Complete: Jan 21 2018
-*/
+//gradient.hpp holds the function gradient(). 
+
 
 #include <iostream>
 #include <armadillo>
@@ -11,29 +7,23 @@ Rev1: Nov 2017
 using namespace std;
 using namespace arma;
 
-//M: gaussDeriv
+//This function produces the spacial gradient of an inputted matrix I. 
+//This gradient is the derivative of matrix I in both the x and
+//y domain, hence there are two outputs x_deriv and y_deriv. 
+
 tuple<mat, mat> gradient(mat I) {
-	//int sigma = 1;
+	
 	int limit = 1000;
-	//int variance = 1;
 	int denominator = 2;
 	double thresh = 1e-6;
 
 	vec numerator, derivative, temp;
 
-	//	function assumes variance is constant, otherwise use: variance = sigma * sigma;
-		//	denominator = 2 * variance;
-		//	derivative = derivative % (temp / variance);
-
-	  //M: gaussDeriv
 	temp = linspace(-limit, limit, (2 * limit + 1));
 	numerator = temp % temp; //returns element-wise product
-
 	derivative = exp(-numerator / denominator) / pow((datum::pi * denominator), 0.5);
 	derivative = -derivative % temp;
 	derivative = derivative(find(abs(derivative) > thresh));
-
-	//derivative.save("mats/gradient/deriv-c.txt", raw_ascii);
 
 	mat x_deriv, y_deriv;
 
